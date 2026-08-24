@@ -1,0 +1,1064 @@
+<title>ChartLint</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --ground:#e8ecf1;
+  --panel:#ffffff;
+  --panel-2:#f3f6fa;
+  --panel-3:#e9eef4;
+  --line:#d2dae4;
+  --line-soft:#e4eaf1;
+  --ink:#16202b;
+  --ink-2:#4a5a6b;
+  --ink-3:#7b8a9a;
+
+  --chrome:#123a52;
+  --chrome-2:#1b5273;
+  --teal:#0f6f8c;
+
+  --err:#c2334d;
+  --err-soft:#fceef1;
+  --warn:#a8680b;
+  --warn-soft:#fbf3e2;
+  --ok:#157f5f;
+  --ok-soft:#e4f4ed;
+
+  --rail:#131922;
+  --rail-2:#1b2430;
+  --rail-3:#212c3a;
+  --rail-line:#2c3846;
+  --rail-ink:#e3e9f1;
+  --rail-ink-2:#94a4b8;
+  --rail-ink-3:#68788c;
+  --brand:#22c1d6;
+
+  --r-err:#ff6b81;
+  --r-warn:#f0b44a;
+  --r-ok:#3ddc9a;
+
+  --sans:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:14px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+
+/* ---------- shell ---------- */
+.app{
+  height:100vh;
+  min-height:640px;
+  display:flex;
+  flex-direction:column;
+  background:var(--ground);
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  height:46px;
+  padding:0 16px;
+  background:linear-gradient(180deg,var(--chrome-2),var(--chrome));
+  color:#dbe8f0;
+  border-bottom:1px solid #0c2a3c;
+}
+.tb-brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.02em;color:#fff;font-size:14.5px}
+.tb-mark{
+  width:22px;height:22px;border-radius:5px;flex:none;
+  background:#dfeaf1;color:var(--chrome);
+  display:grid;place-items:center;font-size:12px;font-weight:900;
+}
+.tb-sep{width:1px;height:20px;background:rgba(255,255,255,.18)}
+.tb-date{font-family:var(--mono);font-size:12px;color:#a9c6d8;letter-spacing:.01em}
+.tb-date b{color:#eaf4fa;font-weight:500}
+.tb-day{
+  margin-left:8px;padding:1px 7px;border-radius:3px;
+  background:rgba(255,255,255,.12);color:#eaf4fa;font-family:var(--sans);font-size:11.5px;
+}
+.tb-nav{display:flex;gap:2px;margin-left:6px}
+.tb-nav span{
+  padding:4px 11px;border-radius:4px;font-size:12.5px;color:#a9c6d8;
+}
+.tb-nav span.on{background:rgba(255,255,255,.14);color:#fff;font-weight:500}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.tb-user{font-size:12px;color:#a9c6d8}
+.btn-reset{
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.24);
+  color:#eaf4fa;
+  border-radius:5px;
+  padding:5px 12px;
+  font-size:12.5px;
+  transition:background .15s;
+}
+.btn-reset:hover{background:rgba(255,255,255,.22)}
+
+/* ---------- patient header ---------- */
+.phead{
+  flex:none;
+  display:flex;
+  align-items:center;
+  gap:22px;
+  padding:11px 18px;
+  background:var(--panel);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 1px 0 rgba(18,58,82,.04);
+}
+.pt-id{
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);
+  letter-spacing:.04em;
+}
+.pt-name{display:flex;align-items:baseline;gap:10px}
+.pt-name .kana{font-size:11px;color:var(--ink-3);letter-spacing:.06em}
+.pt-name .name{font-size:20px;font-weight:700;letter-spacing:.01em}
+.pt-name .demo{font-size:13px;color:var(--ink-2);font-weight:500}
+.pt-facts{display:flex;gap:20px}
+.fact{display:flex;flex-direction:column;gap:1px}
+.fact dt{font-size:10.5px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+.fact dd{margin:0;font-size:13px;font-weight:500}
+.fact dd.dx{color:var(--teal);font-weight:700}
+.allergy{
+  margin-left:auto;
+  display:flex;align-items:center;gap:9px;
+  background:var(--err-soft);
+  border:1px solid #f0c2cd;
+  border-left:4px solid var(--err);
+  border-radius:5px;
+  padding:6px 13px 6px 11px;
+  transition:box-shadow .2s,transform .2s;
+}
+.allergy .al-lab{
+  font-size:10px;letter-spacing:.1em;color:var(--err);font-weight:700;
+}
+.allergy .al-val{font-size:14px;font-weight:700;color:#8e1c33}
+.allergy .al-sub{font-size:11.5px;color:#a8455a}
+.allergy .al-ico{font-size:14px}
+
+/* ---------- main grid ---------- */
+.main{
+  flex:1;min-height:0;
+  display:grid;
+  grid-template-columns:268px minmax(0,1fr) 402px;
+  gap:0;
+}
+.col{min-height:0;overflow-y:auto;overflow-x:hidden}
+.col-left{background:var(--panel-2);border-right:1px solid var(--line);padding:14px 12px 26px}
+.col-mid{padding:16px 22px 30px;display:flex;flex-direction:column;gap:14px}
+.col-right{background:var(--rail);border-left:1px solid #0d1219;display:flex;flex-direction:column;overflow:hidden}
+
+/* ---------- side cards ---------- */
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:6px;
+  margin-bottom:12px;
+  overflow:hidden;
+}
+.card > h2{
+  margin:0;
+  padding:8px 11px;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.06em;
+  color:var(--ink-2);
+  background:var(--panel-3);
+  border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;gap:7px;
+}
+.card > h2 .stamp{
+  margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:400;color:var(--ink-3);letter-spacing:0;
+}
+.labs{width:100%;border-collapse:collapse;font-size:12.5px}
+.labs th{
+  text-align:right;font-weight:400;font-size:9.5px;letter-spacing:.06em;
+  color:var(--ink-3);padding:5px 10px 4px;border-bottom:1px solid var(--line-soft);
+}
+.labs th:first-child{text-align:left}
+.labs td{padding:5px 10px;border-bottom:1px solid #eef2f7;vertical-align:middle}
+.labs tr:last-child td{border-bottom:none}
+.labs .lb-name{font-weight:500;color:var(--ink)}
+.labs .lb-name small{display:block;font-size:10px;color:var(--ink-3);font-weight:400;letter-spacing:.02em}
+.labs .lb-val{
+  text-align:right;font-family:var(--mono);font-size:13.5px;font-weight:500;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.labs .lb-prev{
+  text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink-3);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.labs tr.abn{background:#fdf5f7}
+.labs tr.abn .lb-val{color:var(--err);font-weight:600}
+.labs tr.abn .lb-name{color:#8e1c33}
+.arrow{font-size:11px;margin-left:1px}
+.micro{padding:10px 11px;font-size:12.5px}
+.micro .spec{color:var(--ink-3);font-size:11px;font-family:var(--mono)}
+.micro .org{
+  margin-top:4px;font-weight:700;font-size:13.5px;font-style:italic;color:#8a4a06;
+  font-family:Georgia,"Times New Roman",serif;
+}
+.micro .conf{
+  display:inline-block;margin-top:5px;font-size:10.5px;letter-spacing:.04em;
+  background:var(--warn-soft);color:var(--warn);border:1px solid #ecd6a8;
+  border-radius:3px;padding:1px 6px;font-weight:700;
+}
+.rx{list-style:none;margin:0;padding:4px 0}
+.rx li{padding:7px 11px;border-bottom:1px solid #eef2f7;font-size:12.5px}
+.rx li:last-child{border-bottom:none}
+.rx .drug{font-weight:500}
+.rx .dose{color:var(--ink-2);font-size:11.5px;font-family:var(--mono);letter-spacing:-.01em}
+.rx .since{color:var(--ink-3);font-size:10.5px;font-family:var(--mono)}
+
+/* ---------- note ---------- */
+.note{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:7px;
+  box-shadow:0 1px 3px rgba(18,58,82,.06);
+  position:relative;
+  overflow:hidden;
+}
+.note-tabs{
+  display:flex;align-items:flex-end;gap:2px;
+  padding:8px 12px 0;
+  background:var(--panel-2);
+  border-bottom:1px solid var(--line);
+}
+.note-tabs .tab{
+  padding:6px 15px;font-size:12.5px;color:var(--ink-3);
+  border:1px solid transparent;border-bottom:none;border-radius:5px 5px 0 0;
+  position:relative;top:1px;
+}
+.note-tabs .tab.on{
+  background:var(--panel);border-color:var(--line);color:var(--ink);font-weight:700;
+}
+.note-meta{
+  display:flex;align-items:center;gap:14px;
+  padding:9px 20px;border-bottom:1px solid var(--line-soft);
+  font-size:11.5px;color:var(--ink-3);font-family:var(--mono);
+}
+.note-meta .chip{
+  font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.04em;
+  background:var(--panel-3);color:var(--ink-2);border-radius:3px;padding:2px 7px;
+}
+.note-meta .save{margin-left:auto;color:var(--ink-3)}
+.note-body{position:relative;padding:20px 24px 26px}
+.soap{display:flex;flex-direction:column;gap:16px}
+.soap-row{display:flex;gap:14px}
+.soap-tag{
+  flex:none;width:26px;height:26px;border-radius:5px;
+  display:grid;place-items:center;
+  font-family:var(--mono);font-weight:600;font-size:14px;
+  background:var(--panel-3);color:var(--teal);border:1px solid var(--line);
+}
+.soap-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;max-width:62ch}
+.ln{
+  margin:0;padding:2px 8px;border-radius:4px;
+  font-size:14.5px;line-height:1.75;
+  border-left:3px solid transparent;
+  transition:background .18s,border-color .18s,color .18s;
+}
+.ln.dim{color:var(--ink-2)}
+.ln.hl-soft{background:#fff7d6;border-left-color:#e6c34a}
+.ln.hl{
+  background:#ffef9f;border-left-color:#d9a400;
+  box-shadow:0 0 0 1px #e8cf7a inset;
+}
+.ln.fading{opacity:.25;transition:opacity .22s}
+.ln.flash{animation:flash 1.5s ease-out}
+.ln.slidein{animation:slidein .5s cubic-bezier(.2,.8,.3,1)}
+.ln.slidein.flash{animation:slidein .5s cubic-bezier(.2,.8,.3,1),flash 1.5s ease-out}
+.ln.note-warn{color:#8a4a06;font-weight:500}
+@keyframes flash{
+  0%{background:#b9f0d4;border-left-color:var(--ok)}
+  60%{background:#dcf5e8;border-left-color:#8ed3b4}
+  100%{background:transparent;border-left-color:transparent}
+}
+@keyframes slidein{
+  0%{opacity:0;transform:translateX(-14px);max-height:0;padding-top:0;padding-bottom:0}
+  100%{opacity:1;transform:none;max-height:80px}
+}
+.editing-caret{
+  display:inline-block;width:1.5px;height:1em;background:var(--teal);
+  vertical-align:-.14em;margin-left:1px;animation:blink 1.15s steps(1) infinite;
+}
+@keyframes blink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+
+/* scan beam */
+.beam{
+  position:absolute;left:0;right:0;top:0;height:96px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(34,193,214,0) 0%,rgba(34,193,214,.13) 55%,rgba(34,193,214,.5) 92%,rgba(34,193,214,.9) 100%);
+  border-bottom:1px solid rgba(34,193,214,.85);
+  opacity:0;
+}
+.note-body.scanning .beam{animation:beam 1.45s cubic-bezier(.5,0,.5,1) 1}
+@keyframes beam{
+  0%{opacity:0;transform:translateY(-96px)}
+  8%{opacity:1}
+  92%{opacity:1}
+  100%{opacity:0;transform:translateY(var(--beam-end,520px))}
+}
+
+/* evidence highlight in side panels */
+.evi-hit{
+  animation:eviPulse 1.4s ease-out;
+  position:relative;z-index:1;
+}
+@keyframes eviPulse{
+  0%{box-shadow:0 0 0 0 rgba(217,164,0,.75)}
+  30%{box-shadow:0 0 0 4px rgba(255,222,110,.85)}
+  100%{box-shadow:0 0 0 0 rgba(217,164,0,0)}
+}
+
+/* ---------- lint rail ---------- */
+.rail-head{
+  flex:none;padding:15px 16px 13px;border-bottom:1px solid var(--rail-line);
+  background:linear-gradient(180deg,#1a2331,var(--rail));
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{
+  width:30px;height:30px;flex:none;border-radius:7px;
+  background:linear-gradient(150deg,#2ee0ee,#1795b3);
+  display:grid;place-items:center;
+  box-shadow:0 0 16px rgba(34,193,214,.34);
+}
+.logo-mark svg{width:15px;height:15px;display:block}
+.logo-txt h1{
+  margin:0;font-size:17px;font-weight:700;letter-spacing:.01em;color:#f2f7fb;line-height:1.15;
+}
+.logo-txt p{
+  margin:1px 0 0;font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--rail-ink-3);
+}
+.logo .ver{
+  margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--rail-ink-3);
+  border:1px solid var(--rail-line);border-radius:3px;padding:1px 5px;
+}
+.creed{
+  margin:12px 0 0;padding:9px 11px;
+  background:var(--rail-2);border-left:2px solid var(--brand);border-radius:0 4px 4px 0;
+  font-size:11.5px;line-height:1.65;color:var(--rail-ink-2);
+}
+.creed b{color:var(--rail-ink);font-weight:500}
+.btn-check{
+  margin-top:12px;width:100%;
+  background:linear-gradient(180deg,#2ecfe2,#159ab4);
+  border:none;border-radius:6px;
+  padding:10px 14px;
+  font-size:14px;font-weight:700;color:#04222a;letter-spacing:.02em;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 4px 14px rgba(21,154,180,.28);
+  transition:filter .15s,transform .1s;
+}
+.btn-check:hover{filter:brightness(1.08)}
+.btn-check:active{transform:translateY(1px)}
+.btn-check[disabled]{opacity:.4;cursor:default;filter:none;box-shadow:none}
+.btn-check kbd{
+  font-family:var(--mono);font-size:10px;background:rgba(4,34,42,.22);
+  border-radius:3px;padding:1px 5px;font-weight:600;
+}
+
+.rail-body{flex:1;min-height:0;overflow-y:auto;padding:0 12px 20px}
+
+.prog{padding:16px 4px 0}
+.prog-bar{height:3px;background:var(--rail-3);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;width:0;background:linear-gradient(90deg,#1795b3,#2ee0ee);transition:width .35s linear}
+.prog-txt{
+  margin-top:9px;font-family:var(--mono);font-size:11px;color:var(--rail-ink-2);
+  display:flex;gap:8px;align-items:center;
+}
+.prog-txt .dot{width:5px;height:5px;border-radius:50%;background:var(--brand);animation:blip .8s infinite alternate}
+@keyframes blip{from{opacity:.25}to{opacity:1}}
+
+.idle{padding:34px 14px;text-align:center;color:var(--rail-ink-3)}
+.idle .glyph{
+  width:44px;height:44px;margin:0 auto 12px;border-radius:10px;
+  border:1px dashed var(--rail-line);display:grid;place-items:center;
+  font-family:var(--mono);font-size:17px;color:var(--rail-ink-3);
+}
+.idle p{margin:0;font-size:12.5px;line-height:1.7}
+.idle .rules{
+  margin-top:16px;padding-top:13px;border-top:1px solid var(--rail-line);
+  font-family:var(--mono);font-size:10.5px;color:var(--rail-ink-3);
+  display:flex;flex-wrap:wrap;gap:5px;justify-content:center;
+}
+.idle .rules span{border:1px solid var(--rail-line);border-radius:3px;padding:1px 5px}
+
+.summary{
+  display:flex;align-items:center;gap:8px;
+  padding:13px 4px 11px;margin-bottom:6px;
+  border-bottom:1px solid var(--rail-line);
+}
+.count{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:700;color:var(--rail-ink);
+  font-variant-numeric:tabular-nums;
+}
+.count .ico{font-size:11px}
+.count.err{color:var(--r-err)}
+.count.warn{color:var(--r-warn)}
+.count.zero{color:var(--rail-ink-3);font-weight:400}
+.summary .fileref{
+  margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--rail-ink-3);
+}
+
+.cards{display:flex;flex-direction:column;gap:9px}
+.lc{
+  background:var(--rail-2);
+  border:1px solid var(--rail-line);
+  border-left:3px solid var(--rail-line);
+  border-radius:6px;
+  padding:11px 12px 12px;
+  cursor:pointer;
+  opacity:0;transform:translateY(8px);
+  animation:cardIn .42s cubic-bezier(.2,.8,.3,1) forwards;
+  transition:border-color .16s,background .16s,box-shadow .16s;
+}
+@keyframes cardIn{to{opacity:1;transform:none}}
+.lc.err{border-left-color:var(--r-err)}
+.lc.warn{border-left-color:var(--r-warn)}
+.lc:hover{background:#202b39}
+.lc.active{background:#222f3f;box-shadow:0 0 0 1px rgba(34,193,214,.55),0 6px 18px rgba(0,0,0,.35)}
+.lc-head{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.sev{
+  font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.1em;
+  border-radius:3px;padding:1px 5px;
+}
+.lc.err .sev{background:rgba(255,107,129,.14);color:var(--r-err)}
+.lc.warn .sev{background:rgba(240,180,74,.14);color:var(--r-warn)}
+.rid{
+  font-family:var(--mono);font-size:10.5px;color:var(--rail-ink-3);letter-spacing:.02em;
+}
+.lc-jump{
+  margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--rail-ink-3);
+  opacity:0;transition:opacity .16s;
+}
+.lc:hover .lc-jump,.lc.active .lc-jump{opacity:1}
+.lc-title{margin:0 0 4px;font-size:14px;font-weight:700;color:#f2f7fb;line-height:1.45}
+.lc-desc{margin:0;font-size:12px;line-height:1.72;color:var(--rail-ink-2)}
+.lc-evi{
+  margin:8px 0 0;padding:6px 8px;border-radius:4px;background:#161e29;
+  font-size:11px;line-height:1.6;color:var(--rail-ink-3);
+  border:1px solid #232f3d;
+}
+.lc-evi b{
+  color:var(--rail-ink-2);font-weight:500;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.1em;display:block;margin-bottom:2px;
+}
+.fix-lab{
+  margin:10px 0 5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  color:var(--rail-ink-3);
+}
+.diff{
+  border:1px solid #232f3d;border-radius:5px;overflow:hidden;background:#11171f;
+  font-family:var(--mono);font-size:11px;line-height:1.65;
+}
+.diff div{padding:3px 8px 3px 6px;display:flex;gap:6px;white-space:pre-wrap;word-break:break-word}
+.diff .sign{flex:none;width:9px;text-align:center;opacity:.8}
+.diff .ctx{color:var(--rail-ink-3)}
+.diff .del{background:rgba(255,107,129,.11);color:#ffb3be}
+.diff .del span:last-child{text-decoration:line-through;text-decoration-color:rgba(255,107,129,.7)}
+.diff .add{background:rgba(61,220,154,.11);color:#9df0c8}
+.lc-actions{display:flex;gap:7px;margin-top:11px}
+.btn-apply,.btn-ignore{
+  border-radius:5px;padding:6px 12px;font-size:12.5px;font-weight:700;
+  border:1px solid transparent;transition:filter .15s,background .15s;
+}
+.btn-apply{background:#2ecfe2;color:#04222a;flex:1}
+.btn-apply:hover{filter:brightness(1.1)}
+.btn-ignore{background:transparent;border-color:var(--rail-line);color:var(--rail-ink-2)}
+.btn-ignore:hover{background:#26313f;color:var(--rail-ink)}
+
+.lc.resolved{cursor:default;padding:8px 12px}
+.lc.resolved .lc-title,.lc.resolved .lc-desc,.lc.resolved .lc-evi,
+.lc.resolved .diff,.lc.resolved .lc-actions,.lc.resolved .fix-lab,.lc.resolved .lc-jump{display:none}
+.lc.applied{border-left-color:var(--r-ok);background:#16241f}
+.lc.applied .lc-head::after{
+  content:"適用済み";margin-left:auto;font-size:11px;font-weight:700;color:var(--r-ok);
+}
+.lc.applied .sev{background:rgba(61,220,154,.14);color:var(--r-ok)}
+.lc.dismissed{border-left-color:#3a4553;background:#181e26;opacity:.55}
+.lc.dismissed .lc-head::after{
+  content:"無視済み";margin-left:auto;font-size:11px;color:var(--rail-ink-3);
+}
+.lc.resolved .lc-head{margin-bottom:0}
+.lc.resolved .rid-title{
+  font-size:11.5px;color:var(--rail-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.rid-title{display:none}
+.lc.resolved .rid-title{display:block}
+
+.done{
+  margin:22px 4px;padding:22px 16px;text-align:center;
+  border:1px solid #234a3c;border-radius:8px;
+  background:linear-gradient(180deg,#16281f,#141c22);
+  animation:cardIn .5s cubic-bezier(.2,.8,.3,1) forwards;opacity:0;
+}
+.done svg{width:42px;height:42px;margin-bottom:9px}
+.done .ring{stroke:var(--r-ok);stroke-width:2.5;fill:none;opacity:.35}
+.done .tick{
+  stroke:var(--r-ok);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:26;stroke-dashoffset:26;animation:draw .5s .18s ease-out forwards;
+}
+@keyframes draw{to{stroke-dashoffset:0}}
+.done h3{margin:0;font-family:var(--mono);font-size:13.5px;color:var(--r-ok);letter-spacing:.02em}
+.done p{margin:6px 0 0;font-size:12px;color:var(--rail-ink-2);line-height:1.7}
+.done .tally{
+  margin-top:12px;padding-top:11px;border-top:1px solid #23303a;
+  font-family:var(--mono);font-size:10.5px;color:var(--rail-ink-3);
+}
+
+/* ---------- footer ---------- */
+.foot{
+  flex:none;display:flex;align-items:center;gap:14px;
+  padding:6px 16px;
+  background:#dde3ea;border-top:1px solid var(--line);
+  font-size:11px;color:var(--ink-3);
+}
+.foot .mock{color:#8b6a20;background:#f6ecd2;border-radius:3px;padding:1px 7px;font-weight:500}
+.foot .right{margin-left:auto;font-family:var(--mono);font-size:10.5px}
+
+@media (max-width:1180px){
+  .app{height:auto;min-height:0}
+  .main{grid-template-columns:1fr;}
+  .col{overflow:visible}
+  .col-right{border-left:none;border-top:1px solid #0d1219}
+  .rail-body{overflow:visible}
+  .phead{flex-wrap:wrap;gap:14px}
+  .allergy{margin-left:0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+}
+</style>
+
+<div class="app">
+
+  <!-- top bar -->
+  <div class="topbar">
+    <div class="tb-brand"><span class="tb-mark">港</span>みなと総合病院　電子カルテ</div>
+    <div class="tb-sep"></div>
+    <div class="tb-date"><b>2026-08-24</b>（月）<span class="tb-day">入院5日目</span></div>
+    <nav class="tb-nav">
+      <span>患者一覧</span><span class="on">経過記録</span><span>オーダ</span><span>検査</span><span>文書</span>
+    </nav>
+    <div class="tb-right">
+      <span class="tb-user">内科病棟 / 佐藤 医師</span>
+      <button class="btn-reset" id="btnReset">デモをリセット</button>
+    </div>
+  </div>
+
+  <!-- patient header -->
+  <div class="phead">
+    <div>
+      <div class="pt-id">ID: 0012345</div>
+      <div class="pt-name">
+        <span class="name">山田 太郎</span>
+        <span class="kana">ヤマダ タロウ</span>
+        <span class="demo">78歳・男性</span>
+      </div>
+    </div>
+    <dl class="pt-facts">
+      <div class="fact"><dt>入院日</dt><dd>2026-08-20</dd></div>
+      <div class="fact"><dt>病棟</dt><dd>5A-512</dd></div>
+      <div class="fact"><dt>診断</dt><dd class="dx">誤嚥性肺炎</dd></div>
+    </dl>
+    <div class="allergy" id="eviAllergy">
+      <span class="al-ico">⚠️</span>
+      <div>
+        <div class="al-lab">ALLERGY</div>
+        <div><span class="al-val">ペニシリン系</span> <span class="al-sub">（発疹）</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- left column -->
+    <div class="col col-left">
+
+      <section class="card">
+        <h2>検査結果<span class="stamp">2026-08-24 06:40</span></h2>
+        <table class="labs">
+          <thead>
+            <tr><th>項目</th><th>本日</th><th>前回</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="lb-name">WBC<small>/μL</small></td>
+              <td class="lb-val">7,200</td>
+              <td class="lb-prev">9,800</td>
+            </tr>
+            <tr>
+              <td class="lb-name">CRP<small>mg/dL</small></td>
+              <td class="lb-val">5.8</td>
+              <td class="lb-prev">12.4</td>
+            </tr>
+            <tr class="abn" id="eviK">
+              <td class="lb-name">K<small>基準 3.6–4.8</small></td>
+              <td class="lb-val">2.9<span class="arrow">↓</span></td>
+              <td class="lb-prev">3.4</td>
+            </tr>
+            <tr class="abn" id="eviCr">
+              <td class="lb-name">Cr<small>mg/dL</small></td>
+              <td class="lb-val">1.6<span class="arrow">↑</span></td>
+              <td class="lb-prev">0.9<br>(8/22)</td>
+            </tr>
+            <tr>
+              <td class="lb-name">Na<small>mEq/L</small></td>
+              <td class="lb-val">138</td>
+              <td class="lb-prev">139</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card" id="eviMicro">
+        <h2>細菌検査</h2>
+        <div class="micro">
+          <div class="spec">喀痰培養 / 8-20 採取</div>
+          <div class="org">Klebsiella pneumoniae</div>
+          <div class="conf">8/23 結果確定</div>
+        </div>
+      </section>
+
+      <section class="card" id="eviRx">
+        <h2>処方中薬剤</h2>
+        <ul class="rx">
+          <li>
+            <div class="drug">アンピシリン・スルバクタム</div>
+            <div class="dose">ABPC/SBT 3g　8時間毎　点滴静注</div>
+            <div class="since">2026-08-20 〜 継続中</div>
+          </li>
+          <li>
+            <div class="drug">ランソプラゾール</div>
+            <div class="dose">15mg　1日1回　朝</div>
+            <div class="since">2026-08-20 〜</div>
+          </li>
+          <li>
+            <div class="drug">アムロジピン</div>
+            <div class="dose">5mg　1日1回　朝</div>
+            <div class="since">継続処方</div>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+
+    <!-- center column -->
+    <div class="col col-mid">
+      <div class="note">
+        <div class="note-tabs">
+          <div class="tab on">経過記録（SOAP）</div>
+          <div class="tab">8/23</div>
+          <div class="tab">8/22</div>
+          <div class="tab">入院時記録</div>
+        </div>
+        <div class="note-meta">
+          <span>2026-08-24 09:12</span>
+          <span>記載: 内科 佐藤</span>
+          <span class="chip">下書き</span>
+          <span class="save">未保存の変更あり</span>
+        </div>
+        <div class="note-body" id="noteBody">
+          <div class="beam"></div>
+          <div class="soap">
+
+            <div class="soap-row">
+              <div class="soap-tag">S</div>
+              <div class="soap-lines" id="sec-s">
+                <p class="ln" id="ln-s1">呼吸苦なし。食事は7割程度摂取。夜間良眠。</p>
+              </div>
+            </div>
+
+            <div class="soap-row">
+              <div class="soap-tag">O</div>
+              <div class="soap-lines" id="sec-o">
+                <p class="ln" id="ln-o1">体温 36.8℃、血圧 128/74、脈拍 76。</p>
+                <p class="ln" id="ln-o2">SpO2 96%（room air）。</p>
+                <p class="ln" id="ln-o3">肺雑音は右下肺で減少傾向。</p>
+              </div>
+            </div>
+
+            <div class="soap-row">
+              <div class="soap-tag">A</div>
+              <div class="soap-lines" id="sec-a">
+                <p class="ln" id="ln-a1"># 誤嚥性肺炎 — 解熱し炎症反応も改善傾向。抗菌薬継続とする。</p>
+                <p class="ln" id="ln-a2"># 低カリウム血症（K 2.9）</p>
+              </div>
+            </div>
+
+            <div class="soap-row">
+              <div class="soap-tag">P</div>
+              <div class="soap-lines" id="sec-p">
+                <p class="ln" id="ln-p1">・ABPC/SBT 3g 8時間毎 継続</p>
+                <p class="ln" id="ln-p2">・喀痰培養結果待ち</p>
+                <p class="ln" id="ln-p3">・酸素 2L/min 継続、SpO2フォロー</p>
+                <p class="ln" id="ln-p4">・嚥下リハビリ継続<span class="editing-caret"></span></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- right column: ChartLint -->
+    <div class="col-right">
+      <div class="rail-head">
+        <div class="logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.6 2 4 13.4h6.2L9.4 22 20 10.2h-6.8z" fill="#04222a"/></svg>
+          </div>
+          <div class="logo-txt">
+            <h1>ChartLint</h1>
+            <p>documentation quality assurance</p>
+          </div>
+          <span class="ver">v0.9</span>
+        </div>
+        <p class="creed">
+          ChartLint は治療方針を提案しません。<b>あなたが書いた記録の中の矛盾・抜け・古い情報</b>だけを指摘します。本文の書き換えは、必ず医師の承認後に行われます。
+        </p>
+        <button class="btn-check" id="btnCheck">カルテをチェック <kbd>⌘⇧L</kbd></button>
+      </div>
+      <div class="rail-body" id="railBody">
+        <div class="idle">
+          <div class="glyph">{ }</div>
+          <p>チェック未実行<br>「カルテをチェック」で経過記録を解析します。</p>
+          <div class="rules">
+            <span>CL-001</span><span>CL-004</span><span>CL-013</span><span>CL-021</span><span>CL-033</span><span>+ 42 rules</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span class="mock">DEMO</span>
+    <span>これはデモ用モックです。患者・病院・記録はすべて架空です。</span>
+    <span class="right">ChartLint v0.9 / ruleset: internal-medicine-jp</span>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var RULES = [
+    {
+      id: "CL-004", sev: "err", title: "記録内矛盾（酸素投与）",
+      desc: "O)「SpO2 96%（room air）」と P)「酸素 2L/min 継続」が矛盾しています。同一記録内で酸素投与の有無が一致していません。",
+      evi: "経過記録 O) 2行目 / P) 3行目（記録内の自己矛盾）",
+      targets: ["ln-o2", "ln-p3"], scrollTo: "ln-o2", evidence: [],
+      diff: [
+        { t: "del", s: "-", x: "O) SpO2 96%（room air）。" },
+        { t: "add", s: "+", x: "O) SpO2 96%（O2 2L/min 投与下）。" }
+      ],
+      action: { kind: "replace", line: "ln-o2", text: "SpO2 96%（O2 2L/min 投与下）。" }
+    },
+    {
+      id: "CL-021", sev: "err", title: "アレルギー・処方矛盾",
+      desc: "アレルギー欄に「ペニシリン系」がありますが、Plan にペニシリン系抗菌薬 ABPC/SBT の継続が記載されています。",
+      evi: "アレルギー登録: ペニシリン系（発疹） / 処方中: ABPC/SBT 3g 8時間毎",
+      targets: ["ln-p1"], scrollTo: "ln-p1", evidence: ["eviAllergy", "eviRx"],
+      diff: [
+        { t: "ctx", s: " ", x: "P) ・ABPC/SBT 3g 8時間毎 継続" },
+        { t: "add", s: "+", x: "P) 　※ペニシリン系アレルギー歴（発疹）あり — 抗菌薬選択を要再検討（薬剤部に相談）" }
+      ],
+      action: {
+        kind: "after", line: "ln-p1", cls: "note-warn",
+        text: "　※ペニシリン系アレルギー歴（発疹）あり — 抗菌薬選択を要再検討（薬剤部に相談）"
+      }
+    },
+    {
+      id: "CL-001", sev: "warn", title: "Assessment に対応する Plan がない",
+      desc: "A) に「低カリウム血症（K 2.9）」がありますが、対応する Plan を検出できませんでした。",
+      evi: "A) # 低カリウム血症（K 2.9） / 検査結果 K 2.9 ↓（基準 3.6–4.8）",
+      targets: ["ln-a2"], scrollTo: "ln-a2", evidence: ["eviK"],
+      diff: [
+        { t: "ctx", s: " ", x: "P) ・嚥下リハビリ継続" },
+        { t: "add", s: "+", x: "P) ・低K血症: カリウム補充を検討、明日 K 再検" }
+      ],
+      action: { kind: "append", sec: "sec-p", text: "・低K血症: カリウム補充を検討、明日 K 再検" }
+    },
+    {
+      id: "CL-013", sev: "warn", title: "重要な検査値変化に言及なし",
+      desc: "Cr が 0.9 → 1.6（8/22→8/24）と上昇していますが、Assessment に腎機能への言及がありません。",
+      evi: "検査結果 Cr 1.6 ↑（前回 8/22: 0.9）",
+      targets: ["ln-a1", "ln-a2"], scrollTo: "ln-a1", evidence: ["eviCr"],
+      diff: [
+        { t: "ctx", s: " ", x: "A) # 低カリウム血症（K 2.9）" },
+        { t: "add", s: "+", x: "A) # 腎機能障害の進行（Cr 0.9→1.6）— 脱水・薬剤性の評価を行う" }
+      ],
+      action: { kind: "append", sec: "sec-a", text: "# 腎機能障害の進行（Cr 0.9→1.6）— 脱水・薬剤性の評価を行う" }
+    },
+    {
+      id: "CL-033", sev: "warn", title: "古い情報のコピー残存",
+      desc: "P)「喀痰培養結果待ち」とありますが、喀痰培養は 8/23 に結果が確定しています（Klebsiella pneumoniae）。前日の記録からコピーされた可能性があります。",
+      evi: "細菌検査: 喀痰培養（8/20 採取）— 8/23 結果確定",
+      targets: ["ln-p2"], scrollTo: "ln-p2", evidence: ["eviMicro"],
+      diff: [
+        { t: "del", s: "-", x: "P) ・喀痰培養結果待ち" },
+        { t: "add", s: "+", x: "P) ・喀痰培養: Klebsiella pneumoniae 検出（8/23確定）— 感受性結果を確認" }
+      ],
+      action: {
+        kind: "replace", line: "ln-p2",
+        text: "・喀痰培養: Klebsiella pneumoniae 検出（8/23確定）— 感受性結果を確認"
+      }
+    }
+  ];
+
+  var railBody = document.getElementById("railBody");
+  var noteBody = document.getElementById("noteBody");
+  var btnCheck = document.getElementById("btnCheck");
+  var open = RULES.length;
+  var errLeft = 2, warnLeft = 3;
+  var activeCard = null;
+  var clearTimer = null;
+
+  document.getElementById("btnReset").addEventListener("click", function () {
+    location.reload();
+  });
+
+  /* ---------- highlight linking ---------- */
+  function clearMarks(hard) {
+    var i, els = noteBody.querySelectorAll(".ln");
+    for (i = 0; i < els.length; i++) {
+      els[i].classList.remove("hl-soft");
+      if (hard) els[i].classList.remove("hl");
+    }
+  }
+  function softHighlight(rule) {
+    if (activeCard) return;
+    if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; clearMarks(true); }
+    clearMarks(false);
+    rule.targets.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.add("hl-soft");
+    });
+  }
+  function hardHighlight(rule) {
+    if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
+    clearMarks(true);
+    rule.targets.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.add("hl");
+    });
+    rule.evidence.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove("evi-hit");
+      void el.offsetWidth;
+      el.classList.add("evi-hit");
+    });
+    var target = document.getElementById(rule.scrollTo);
+    if (target && target.scrollIntoView) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
+  /* ---------- text mutations ---------- */
+  function applyAction(a) {
+    if (a.kind === "replace") {
+      var el = document.getElementById(a.line);
+      if (!el) return;
+      el.classList.add("fading");
+      setTimeout(function () {
+        el.textContent = a.text;
+        el.classList.remove("fading", "hl", "hl-soft");
+        void el.offsetWidth;
+        el.classList.add("flash");
+      }, 230);
+      return;
+    }
+    var p = document.createElement("p");
+    p.className = "ln slidein flash" + (a.cls ? " " + a.cls : "");
+    p.textContent = a.text;
+    if (a.kind === "after") {
+      var ref = document.getElementById(a.line);
+      ref.parentNode.insertBefore(p, ref.nextSibling);
+    } else {
+      var sec = document.getElementById(a.sec);
+      var caret = sec.querySelector(".editing-caret");
+      if (caret) caret.parentNode.removeChild(caret);
+      sec.appendChild(p);
+    }
+    setTimeout(function () {
+      if (p.scrollIntoView) p.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 120);
+  }
+
+  /* ---------- rail rendering ---------- */
+  function countsMarkup() {
+    return '<div class="summary">' +
+      '<span class="count err' + (errLeft ? "" : " zero") + '" id="cErr"><span class="ico">🔴</span>' +
+      '<span id="nErr">' + errLeft + '</span> Errors</span>' +
+      '<span class="count warn' + (warnLeft ? "" : " zero") + '" id="cWarn"><span class="ico">🟡</span>' +
+      '<span id="nWarn">' + warnLeft + '</span> Warnings</span>' +
+      '<span class="fileref">progress-note 8/24</span>' +
+      '</div>';
+  }
+
+  function diffMarkup(diff) {
+    var out = '<div class="fix-lab">修正案</div><div class="diff">';
+    diff.forEach(function (d) {
+      out += '<div class="' + d.t + '"><span class="sign">' + d.s + '</span><span>' +
+        esc(d.x) + '</span></div>';
+    });
+    return out + "</div>";
+  }
+
+  function esc(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function cardMarkup(r, idx) {
+    return '<article class="lc ' + r.sev + '" data-idx="' + idx + '" style="animation-delay:' +
+      (idx * 90) + 'ms">' +
+      '<div class="lc-head">' +
+        '<span class="sev">' + (r.sev === "err" ? "ERROR" : "WARNING") + '</span>' +
+        '<code class="rid">' + r.id + '</code>' +
+        '<span class="rid-title">' + esc(r.title) + '</span>' +
+        '<span class="lc-jump">該当箇所へ →</span>' +
+      '</div>' +
+      '<h3 class="lc-title">' + esc(r.title) + '</h3>' +
+      '<p class="lc-desc">' + esc(r.desc) + '</p>' +
+      '<div class="lc-evi"><b>根拠</b>' + esc(r.evi) + '</div>' +
+      diffMarkup(r.diff) +
+      '<div class="lc-actions">' +
+        '<button class="btn-apply">承認して適用</button>' +
+        '<button class="btn-ignore">無視</button>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function renderResults() {
+    var html = countsMarkup() + '<div class="cards">';
+    RULES.forEach(function (r, i) { html += cardMarkup(r, i); });
+    html += "</div>";
+    railBody.innerHTML = html;
+    wire();
+  }
+
+  function wire() {
+    var cards = railBody.querySelectorAll(".lc");
+    Array.prototype.forEach.call(cards, function (card) {
+      var rule = RULES[+card.getAttribute("data-idx")];
+
+      card.addEventListener("mouseenter", function () { softHighlight(rule); });
+      card.addEventListener("mouseleave", function () { if (!activeCard) clearMarks(false); });
+
+      card.addEventListener("click", function () {
+        if (card.classList.contains("resolved")) return;
+        if (activeCard && activeCard !== card) activeCard.classList.remove("active");
+        card.classList.add("active");
+        activeCard = card;
+        hardHighlight(rule);
+      });
+
+      card.querySelector(".btn-apply").addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (rule.applied || card.classList.contains("resolved")) return;
+        rule.applied = true;
+        hardHighlight(rule);
+        setTimeout(function () { applyAction(rule.action); }, 180);
+        resolve(card, rule, "applied");
+      });
+
+      card.querySelector(".btn-ignore").addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (rule.applied) return;
+        resolve(card, rule, "dismissed");
+      });
+    });
+  }
+
+  function resolve(card, rule, state) {
+    if (card.classList.contains("resolved")) return;
+    card.classList.remove("active");
+    card.classList.add("resolved", state);
+    if (activeCard === card) activeCard = null;
+    if (clearTimer) clearTimeout(clearTimer);
+    clearTimer = setTimeout(function () { clearTimer = null; clearMarks(true); }, 1600);
+
+    if (rule.sev === "err") errLeft--; else warnLeft--;
+    open--;
+    tick("nErr", errLeft, "cErr");
+    tick("nWarn", warnLeft, "cWarn");
+    if (open === 0) setTimeout(showDone, 620);
+  }
+
+  function tick(numId, val, chipId) {
+    var n = document.getElementById(numId);
+    if (n) n.textContent = val;
+    var c = document.getElementById(chipId);
+    if (c) c.classList.toggle("zero", val === 0);
+  }
+
+  function showDone() {
+    var done = document.createElement("div");
+    done.className = "done";
+    done.innerHTML =
+      '<svg viewBox="0 0 40 40" aria-hidden="true">' +
+        '<circle class="ring" cx="20" cy="20" r="17"></circle>' +
+        '<path class="tick" d="M12.5 20.5 L18 26 L28 14.5"></path>' +
+      '</svg>' +
+      '<h3>All checks passed</h3>' +
+      '<p>指摘事項はありません。<br>記録内の矛盾はすべて確認済みです。</p>' +
+      '<div class="tally">5 issues reviewed · 承認による修正のみ適用</div>';
+    railBody.insertBefore(done, railBody.firstChild);
+    done.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  /* ---------- scan ---------- */
+  var PHASES = [
+    "構文解析: SOAP 構造を読み取り中…",
+    "検査結果と本文を照合中…",
+    "処方・アレルギー登録と照合中…",
+    "記録内の整合性を検証中…"
+  ];
+
+  btnCheck.addEventListener("click", function () {
+    btnCheck.disabled = true;
+    btnCheck.textContent = "解析中…";
+
+    railBody.innerHTML =
+      '<div class="prog">' +
+        '<div class="prog-bar"><div class="prog-fill" id="pf"></div></div>' +
+        '<div class="prog-txt"><span class="dot"></span><span id="pt">' + PHASES[0] + '</span></div>' +
+      '</div>';
+
+    noteBody.style.setProperty("--beam-end", noteBody.offsetHeight + "px");
+    noteBody.classList.add("scanning");
+
+    var fill = document.getElementById("pf");
+    var txt = document.getElementById("pt");
+    setTimeout(function () { fill.style.width = "34%"; }, 40);
+    setTimeout(function () { fill.style.width = "62%"; txt.textContent = PHASES[1]; }, 420);
+    setTimeout(function () { fill.style.width = "84%"; txt.textContent = PHASES[2]; }, 820);
+    setTimeout(function () { fill.style.width = "100%"; txt.textContent = PHASES[3]; }, 1180);
+
+    setTimeout(function () {
+      noteBody.classList.remove("scanning");
+      renderResults();
+      btnCheck.textContent = "解析完了 · 5件検出";
+    }, 1550);
+  });
+})();
+</script>
