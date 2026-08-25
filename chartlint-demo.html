@@ -152,11 +152,18 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .main{
   flex:1;min-height:0;
   display:grid;
-  grid-template-columns:minmax(0,1fr) clamp(392px,37%,580px);
+  grid-template-columns:268px minmax(0,1fr) clamp(392px,37%,580px);
   grid-template-rows:minmax(0,1fr);
   gap:0;
 }
 .col{min-height:0;overflow-y:auto;overflow-x:hidden}
+.pane-labs{
+  min-height:0;overflow-y:auto;overflow-x:hidden;
+  background:var(--panel-2);
+  padding:13px 12px 26px;
+  display:flex;flex-direction:column;gap:12px;
+  border-right:1px solid var(--line);
+}
 .pane-chart{
   min-height:0;overflow-y:auto;overflow-x:hidden;
   background:var(--ground);
@@ -173,13 +180,15 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   position:relative;z-index:2;
 }
 /* always-visible scrollbars (macOS overlay bars can't be grabbed) */
-.pane-chart{scrollbar-width:thin;scrollbar-color:#a3b1c2 #dde4ec}
-.pane-chart::-webkit-scrollbar{width:11px}
-.pane-chart::-webkit-scrollbar-track{background:#dde4ec;border-left:1px solid var(--line)}
-.pane-chart::-webkit-scrollbar-thumb{
+.pane-chart,.pane-labs{scrollbar-width:thin;scrollbar-color:#a3b1c2 #dde4ec}
+.pane-chart::-webkit-scrollbar,.pane-labs::-webkit-scrollbar{width:11px}
+.pane-chart::-webkit-scrollbar-track,.pane-labs::-webkit-scrollbar-track{
+  background:#dde4ec;border-left:1px solid var(--line);
+}
+.pane-chart::-webkit-scrollbar-thumb,.pane-labs::-webkit-scrollbar-thumb{
   background:#a3b1c2;border-radius:6px;border:2px solid #dde4ec;
 }
-.pane-chart::-webkit-scrollbar-thumb:hover{background:#8798ad}
+.pane-chart::-webkit-scrollbar-thumb:hover,.pane-labs::-webkit-scrollbar-thumb:hover{background:#8798ad}
 .rail-body{scrollbar-width:thin;scrollbar-color:#3a4a5d #161d27}
 .rail-body::-webkit-scrollbar{width:11px}
 .rail-body::-webkit-scrollbar-track{background:#161d27}
@@ -197,13 +206,11 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .pane-label b{color:var(--ink-2);font-weight:600}
 .pane-label::after{content:"";flex:1;height:1px;background:var(--line)}
 
-/* ---------- evidence band ---------- */
+/* ---------- evidence column ---------- */
 .evi-band{
   flex:none;
-  display:grid;
-  grid-template-columns:minmax(0,1.55fr) minmax(0,.85fr) minmax(0,1.05fr);
+  display:flex;flex-direction:column;
   gap:10px;
-  align-items:stretch;
 }
 .card{
   background:var(--panel);
@@ -228,7 +235,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 }
 .lab-strip{display:flex;gap:5px;padding:8px;flex-wrap:wrap;flex:1}
 .lab-chip{
-  flex:1 1 66px;min-width:62px;
+  flex:1 1 88px;min-width:80px;
   border:1px solid var(--line-soft);border-radius:5px;background:var(--panel-2);
   padding:5px 7px 6px;
 }
@@ -587,10 +594,12 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   .app{height:auto;min-height:0}
   .main{grid-template-columns:1fr;grid-template-rows:auto}
   .col{overflow:visible}
+  .pane-labs{overflow:visible;border-right:none;border-bottom:1px solid var(--line)}
   .pane-chart{overflow:visible;border-right:none}
   .pane-lint{border-left:none;border-top:1px solid #0d1219;box-shadow:none}
   .rail-body{overflow:visible}
-  .evi-band{grid-template-columns:1fr}
+  .evi-band{flex-direction:row;flex-wrap:wrap}
+  .evi-band > .card{flex:1 1 240px}
   .phead{flex-wrap:wrap;gap:14px}
   .allergy{margin-left:0}
 }
@@ -642,10 +651,10 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
   <div class="main">
 
-    <!-- ===== left pane: chart ===== -->
-    <div class="col pane-chart">
+    <!-- ===== left column: evidence ===== -->
+    <div class="col pane-labs">
 
-      <div class="pane-label"><b>カルテ</b> / patient chart</div>
+      <div class="pane-label"><b>検査・処方</b> / evidence</div>
 
       <div class="evi-band">
 
@@ -710,6 +719,13 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
         </section>
 
       </div>
+
+    </div>
+
+    <!-- ===== center column: progress note ===== -->
+    <div class="col pane-chart">
+
+      <div class="pane-label"><b>カルテ</b> / patient chart</div>
 
       <div class="note">
         <div class="note-tabs">
@@ -801,7 +817,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   <div class="foot">
     <span class="mock">DEMO</span>
     <span>これはデモ用モックです。患者・病院・記録はすべて架空です。</span>
-    <span class="right">ChartLint v0.9.7 (build 7) / ruleset: internal-medicine-jp</span>
+    <span class="right">ChartLint v0.9.8 (build 8) / ruleset: internal-medicine-jp</span>
   </div>
 
 </div>
@@ -889,21 +905,23 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   });
 
   /* ---------- wheel fallback (embeds where native wheel scrolling is swallowed) ---------- */
-  var paneChart = document.querySelector(".pane-chart");
-  if (paneChart) {
-    paneChart.addEventListener("wheel", function (e) {
-      if (e.ctrlKey) return;
-      var oy = window.getComputedStyle(paneChart).overflowY;
-      if (oy !== "auto" && oy !== "scroll") return;
-      if (paneChart.scrollHeight <= paneChart.clientHeight) return;
-      var d = e.deltaY;
-      if (e.deltaMode === 1) d *= 24;
-      else if (e.deltaMode === 2) d *= paneChart.clientHeight;
-      if (!d) return;
-      e.preventDefault();
-      paneChart.scrollTop += d;
-    }, { passive: false });
-  }
+  Array.prototype.forEach.call(
+    document.querySelectorAll(".pane-chart, .pane-labs"),
+    function (pane) {
+      pane.addEventListener("wheel", function (e) {
+        if (e.ctrlKey) return;
+        var oy = window.getComputedStyle(pane).overflowY;
+        if (oy !== "auto" && oy !== "scroll") return;
+        if (pane.scrollHeight <= pane.clientHeight) return;
+        var d = e.deltaY;
+        if (e.deltaMode === 1) d *= 24;
+        else if (e.deltaMode === 2) d *= pane.clientHeight;
+        if (!d) return;
+        e.preventDefault();
+        pane.scrollTop += d;
+      }, { passive: false });
+    }
+  );
 
   /* ---------- highlight linking ---------- */
   function clearMarks(hard) {
@@ -1092,7 +1110,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
       '<p>指摘事項はありません。<br>記録内の矛盾はすべて確認済みです。</p>' +
       '<div class="tally">5 issues reviewed · 承認による修正のみ適用</div>';
     railBody.insertBefore(done, railBody.firstChild);
-    done.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (done.scrollIntoView) done.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   /* ---------- scan ---------- */
