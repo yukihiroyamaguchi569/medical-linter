@@ -35,6 +35,7 @@
 
   --r-err:#ff6b81;
   --r-warn:#f0b44a;
+  --r-info:#6fb7f5;
   --r-ok:#3ddc9a;
 
   --sans:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
@@ -147,6 +148,44 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .allergy .al-val{font-size:14px;font-weight:700;color:#8e1c33}
 .allergy .al-sub{font-size:11.5px;color:#a8455a}
 .allergy .al-ico{font-size:14px}
+.allergy.none{
+  background:var(--panel-2);border-color:var(--line);border-left-color:#aab8c6;
+}
+.allergy.none .al-lab{color:var(--ink-3)}
+.allergy.none .al-val{color:var(--ink-2);font-weight:500}
+.allergy.none .al-sub{color:var(--ink-3)}
+
+/* ---------- patient tabs ---------- */
+.ptabs{
+  flex:none;display:flex;align-items:stretch;gap:3px;
+  padding:0 14px;
+  background:var(--panel-3);
+  border-bottom:1px solid var(--line);
+}
+.ptabs .plab{
+  align-self:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;
+  color:var(--ink-3);margin-right:9px;text-transform:uppercase;
+}
+.ptab{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 14px 7px;
+  background:transparent;border:1px solid transparent;border-bottom:none;
+  border-radius:5px 5px 0 0;
+  position:relative;top:1px;
+  color:var(--ink-2);
+  transition:background .15s,color .15s;
+}
+.ptab:hover{background:#e0e7ef}
+.ptab .pn{font-size:13px;font-weight:500;white-space:nowrap}
+.ptab .pd{font-size:10.5px;color:var(--ink-3);white-space:nowrap}
+.ptab.on{
+  background:var(--panel);border-color:var(--line);color:var(--ink);
+}
+.ptab.on .pn{font-weight:700}
+.ptab.on::after{
+  content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:2px;background:var(--teal);
+  border-radius:2px 2px 0 0;
+}
 
 /* ---------- main: two panes ---------- */
 .main{
@@ -262,11 +301,18 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   margin-top:3px;font-weight:700;font-size:13px;font-style:italic;color:#8a4a06;
   font-family:Georgia,"Times New Roman",serif;line-height:1.35;
 }
+.micro .org.plain{
+  font-family:var(--mono);font-style:normal;font-size:15px;color:var(--ink);letter-spacing:-.01em;
+}
+.micro .org.pending{
+  font-family:var(--sans);font-style:normal;font-size:13px;color:var(--warn);font-weight:700;
+}
 .micro .conf{
   display:inline-block;margin-top:5px;font-size:10px;letter-spacing:.04em;
   background:var(--warn-soft);color:var(--warn);border:1px solid #ecd6a8;
   border-radius:3px;padding:1px 6px;font-weight:700;
 }
+.micro .conf.ok{background:var(--ok-soft);color:var(--ok);border-color:#b9e0cd}
 .rx{list-style:none;margin:0;padding:2px 0;flex:1}
 .rx li{
   padding:5px 10px;border-bottom:1px solid #eef2f7;font-size:12px;
@@ -323,6 +369,10 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   font-family:var(--mono);font-weight:600;font-size:14px;
   background:var(--panel-3);color:var(--teal);border:1px solid var(--line);
 }
+.soap-tag.wide{
+  width:auto;min-width:26px;padding:0 8px;
+  font-family:var(--sans);font-size:12px;font-weight:700;
+}
 .soap-lines{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;max-width:62ch}
 .ln{
   margin:0;padding:2px 8px;border-radius:4px;
@@ -331,6 +381,15 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   transition:background .18s,border-color .18s,color .18s;
 }
 .ln.dim{color:var(--ink-2)}
+/* 承認適用済みの行に残る永続マーク */
+.ln.applied-mark{
+  background:#e9f6ef;
+  border-left-color:var(--ok);
+}
+.ln-removed{
+  height:0;margin:1px 0 1px 8px;max-width:62ch;
+  border-top:2px solid rgba(21,127,95,.5);border-radius:2px;
+}
 .ln.hl-soft{background:#fff7d6;border-left-color:#e6c34a}
 .ln.hl{
   background:#ffef9f;border-left-color:#d9a400;
@@ -341,6 +400,16 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .ln.slidein{animation:slidein .5s cubic-bezier(.2,.8,.3,1)}
 .ln.slidein.flash{animation:slidein .5s cubic-bezier(.2,.8,.3,1),flash 1.5s ease-out}
 .ln.note-warn{color:#8a4a06;font-weight:500}
+.ln.undoflash{animation:undoflash 1s ease-out}
+@keyframes undoflash{
+  0%{background:#dbe6f2;border-left-color:#8fa6be}
+  100%{background:transparent;border-left-color:transparent}
+}
+.ln.removing{
+  opacity:0;max-height:0;padding-top:0;padding-bottom:0;overflow:hidden;
+  background:#fbe3e8;
+  transition:opacity .3s ease,max-height .4s ease,padding .4s ease,background .3s ease;
+}
 @keyframes flash{
   0%{background:#b9f0d4;border-left-color:var(--ok)}
   60%{background:#dcf5e8;border-left-color:#8ed3b4}
@@ -384,7 +453,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
 /* ---------- lint rail ---------- */
 .rail-head{
-  flex:none;padding:15px 18px 14px;border-bottom:1px solid var(--rail-line);
+  flex:none;padding:14px 18px 16px;border-bottom:1px solid var(--rail-line);
   background:linear-gradient(180deg,#1a2331,var(--rail));
 }
 .logo{display:flex;align-items:center;gap:10px}
@@ -402,32 +471,22 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   margin:1px 0 0;font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;
   text-transform:uppercase;color:var(--rail-ink-3);
 }
-.logo .ver{
-  margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--rail-ink-3);
-  border:1px solid var(--rail-line);border-radius:3px;padding:1px 5px;
-}
-.creed{
-  margin:12px 0 0;padding:9px 11px;
-  background:var(--rail-2);border-left:2px solid var(--brand);border-radius:0 4px 4px 0;
-  font-size:11.5px;line-height:1.65;color:var(--rail-ink-2);
-}
-.creed b{color:var(--rail-ink);font-weight:500}
 .btn-check{
-  margin-top:12px;width:100%;
+  margin-left:auto;flex:none;
   background:linear-gradient(180deg,#2ecfe2,#159ab4);
-  border:none;border-radius:6px;
-  padding:10px 14px;
-  font-size:14px;font-weight:700;color:#04222a;letter-spacing:.02em;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 4px 14px rgba(21,154,180,.28);
+  border:none;border-radius:5px;
+  padding:7px 12px;
+  font-size:12.5px;font-weight:700;color:#04222a;letter-spacing:.01em;
+  display:flex;align-items:center;gap:7px;white-space:nowrap;
+  box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 3px 10px rgba(21,154,180,.26);
   transition:filter .15s,transform .1s;
 }
 .btn-check:hover{filter:brightness(1.08)}
 .btn-check:active{transform:translateY(1px)}
-.btn-check[disabled]{opacity:.4;cursor:default;filter:none;box-shadow:none}
+.btn-check[disabled]{opacity:.45;cursor:default;filter:none;box-shadow:none}
 .btn-check kbd{
-  font-family:var(--mono);font-size:10px;background:rgba(4,34,42,.22);
-  border-radius:3px;padding:1px 5px;font-weight:600;
+  font-family:var(--mono);font-size:9px;background:rgba(4,34,42,.22);
+  border-radius:3px;padding:1px 4px;font-weight:600;
 }
 
 .rail-body{flex:1;min-height:0;overflow-y:auto;padding:0 16px 22px}
@@ -469,6 +528,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .count .ico{font-size:11px}
 .count.err{color:var(--r-err)}
 .count.warn{color:var(--r-warn)}
+.count.info{color:var(--r-info)}
 .count.zero{color:var(--rail-ink-3);font-weight:400}
 .summary .fileref{
   margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--rail-ink-3);
@@ -489,6 +549,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 @keyframes cardIn{to{opacity:1;transform:none}}
 .lc.err{border-left-color:var(--r-err)}
 .lc.warn{border-left-color:var(--r-warn)}
+.lc.info{border-left-color:var(--r-info)}
 .lc:hover{background:#202b39}
 .lc.active{background:#222f3f;box-shadow:0 0 0 1px rgba(34,193,214,.55),0 6px 18px rgba(0,0,0,.35)}
 .lc-head{display:flex;align-items:center;gap:7px;margin-bottom:5px}
@@ -498,6 +559,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 }
 .lc.err .sev{background:rgba(255,107,129,.14);color:var(--r-err)}
 .lc.warn .sev{background:rgba(240,180,74,.14);color:var(--r-warn)}
+.lc.info .sev{background:rgba(111,183,245,.14);color:var(--r-info)}
 .rid{
   font-family:var(--mono);font-size:10.5px;color:var(--rail-ink-3);letter-spacing:.02em;
 }
@@ -508,20 +570,17 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .lc:hover .lc-jump,.lc.active .lc-jump{opacity:1}
 .lc-title{margin:0 0 4px;font-size:14px;font-weight:700;color:#f2f7fb;line-height:1.45}
 .lc-desc{margin:0;font-size:12px;line-height:1.72;color:var(--rail-ink-2)}
-.lc-evi{
-  margin:8px 0 0;padding:6px 8px;border-radius:4px;background:#161e29;
-  font-size:11px;line-height:1.6;color:var(--rail-ink-3);
-  border:1px solid #232f3d;
+.evi-link{
+  background:none;border:none;padding:0 1px;margin:0;
+  font:inherit;color:#5fd8ea;
+  border-bottom:1px dotted rgba(95,216,234,.65);
+  border-radius:2px;cursor:pointer;
+  transition:color .15s,border-color .15s,background .15s;
 }
-.lc-evi b{
-  color:var(--rail-ink-2);font-weight:500;font-family:var(--mono);font-size:9.5px;
-  letter-spacing:.1em;display:block;margin-bottom:2px;
-}
-.fix-lab{
-  margin:10px 0 5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
-  color:var(--rail-ink-3);
-}
+.evi-link:hover{color:#a6ecf7;border-bottom-color:#a6ecf7;background:rgba(34,193,214,.14)}
+.evi-link:active{background:rgba(34,193,214,.26)}
 .diff{
+  margin-top:9px;
   border:1px solid #232f3d;border-radius:5px;overflow:hidden;background:#11171f;
   font-family:var(--mono);font-size:11px;line-height:1.65;
 }
@@ -542,12 +601,23 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 .btn-ignore:hover{background:#26313f;color:var(--rail-ink)}
 
 .lc.resolved{cursor:default;padding:8px 12px}
-.lc.resolved .lc-title,.lc.resolved .lc-desc,.lc.resolved .lc-evi,
-.lc.resolved .diff,.lc.resolved .lc-actions,.lc.resolved .fix-lab,.lc.resolved .lc-jump{display:none}
+.lc.resolved .lc-title,.lc.resolved .lc-desc,
+.lc.resolved .diff,.lc.resolved .lc-actions,.lc.resolved .lc-jump{display:none}
 .lc.applied{border-left-color:var(--r-ok);background:#16241f}
 .lc.applied .lc-head::after{
-  content:"適用済み";margin-left:auto;font-size:11px;font-weight:700;color:var(--r-ok);
+  content:"✓ 適用済み";margin-left:auto;font-size:11px;font-weight:700;color:var(--r-ok);
+  order:1;
 }
+.btn-undo{display:none}
+.lc.applied .btn-undo{
+  display:inline-block;order:2;margin-left:9px;
+  background:none;border:1px solid var(--rail-line);border-radius:4px;
+  padding:3px 9px;font-size:10.5px;line-height:1.3;color:var(--rail-ink-3);
+  cursor:pointer;white-space:nowrap;
+  transition:color .15s,border-color .15s,background .15s;
+}
+.lc.applied .btn-undo:hover{color:var(--rail-ink);border-color:#42566b;background:#243444}
+.lc.applied .btn-undo:active{background:#2c3f52}
 .lc.applied .sev{background:rgba(61,220,154,.14);color:var(--r-ok)}
 .lc.dismissed{border-left-color:#3a4553;background:#181e26;opacity:.55}
 .lc.dismissed .lc-head::after{
@@ -615,7 +685,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   <div class="topbar">
     <div class="tb-brand"><span class="tb-mark">港</span>みなと総合病院　電子カルテ</div>
     <div class="tb-sep"></div>
-    <div class="tb-date"><b>2026-08-24</b>（月）<span class="tb-day">入院5日目</span></div>
+    <div class="tb-date"><b>2026-08-24</b>（月）<span class="tb-day" id="tbDay">入院5日目</span></div>
     <nav class="tb-nav">
       <span>患者一覧</span><span class="on">経過記録</span><span>オーダ</span><span>検査</span><span>文書</span>
     </nav>
@@ -625,29 +695,11 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
     </div>
   </div>
 
+  <!-- open patients -->
+  <div class="ptabs" id="ptabs"></div>
+
   <!-- patient header -->
-  <div class="phead">
-    <div>
-      <div class="pt-id">ID: 0012345</div>
-      <div class="pt-name">
-        <span class="name">山田 太郎</span>
-        <span class="kana">ヤマダ タロウ</span>
-        <span class="demo">78歳・男性</span>
-      </div>
-    </div>
-    <dl class="pt-facts">
-      <div class="fact"><dt>入院日</dt><dd>2026-08-20</dd></div>
-      <div class="fact"><dt>病棟</dt><dd>5A-512</dd></div>
-      <div class="fact"><dt>診断</dt><dd class="dx">誤嚥性肺炎</dd></div>
-    </dl>
-    <div class="allergy" id="eviAllergy">
-      <span class="al-ico">⚠️</span>
-      <div>
-        <div class="al-lab">ALLERGY</div>
-        <div><span class="al-val">ペニシリン系</span> <span class="al-sub">（発疹）</span></div>
-      </div>
-    </div>
-  </div>
+  <div class="phead" id="phead"></div>
 
   <div class="main">
 
@@ -656,69 +708,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
       <div class="pane-label"><b>検査・処方</b> / evidence</div>
 
-      <div class="evi-band">
-
-        <section class="card">
-          <h2>検査結果<span class="stamp">8/24 06:40</span></h2>
-          <div class="lab-strip">
-            <div class="lab-chip">
-              <div class="lb-n">WBC<em>/μL</em></div>
-              <div class="lb-v">7,200</div>
-              <div class="lb-p">前回 9,800</div>
-            </div>
-            <div class="lab-chip">
-              <div class="lb-n">CRP<em>mg/dL</em></div>
-              <div class="lb-v">5.8</div>
-              <div class="lb-p">前回 12.4</div>
-            </div>
-            <div class="lab-chip abn" id="eviK">
-              <div class="lb-n">K<em>mEq/L</em></div>
-              <div class="lb-v">2.9<span class="arrow">↓</span></div>
-              <div class="lb-p">前回 3.4</div>
-              <div class="lb-p">基準 3.6–4.8</div>
-            </div>
-            <div class="lab-chip abn" id="eviCr">
-              <div class="lb-n">Cr<em>mg/dL</em></div>
-              <div class="lb-v">1.6<span class="arrow">↑</span></div>
-              <div class="lb-p">8/22 0.9</div>
-            </div>
-            <div class="lab-chip">
-              <div class="lb-n">Na<em>mEq/L</em></div>
-              <div class="lb-v">138</div>
-              <div class="lb-p">前回 139</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="card" id="eviMicro">
-          <h2>細菌検査</h2>
-          <div class="micro">
-            <div class="spec">喀痰培養 / 8-20 採取</div>
-            <div class="org">Klebsiella pneumoniae</div>
-            <div class="conf">8/23 結果確定</div>
-          </div>
-        </section>
-
-        <section class="card" id="eviRx">
-          <h2>処方中薬剤</h2>
-          <ul class="rx">
-            <li>
-              <span class="drug">ABPC/SBT</span>
-              <span class="dose">3g 8時間毎 点滴 8/20〜</span>
-              <span class="sub">アンピシリン・スルバクタム（ペニシリン系）</span>
-            </li>
-            <li>
-              <span class="drug">ランソプラゾール</span>
-              <span class="dose">15mg 1日1回 朝</span>
-            </li>
-            <li>
-              <span class="drug">アムロジピン</span>
-              <span class="dose">5mg 1日1回 朝</span>
-            </li>
-          </ul>
-        </section>
-
-      </div>
+      <div class="evi-band" id="eviBand"></div>
 
     </div>
 
@@ -727,60 +717,8 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
       <div class="pane-label"><b>カルテ</b> / patient chart</div>
 
-      <div class="note">
-        <div class="note-tabs">
-          <div class="tab on">経過記録（SOAP）</div>
-          <div class="tab">8/23</div>
-          <div class="tab">8/22</div>
-          <div class="tab">入院時記録</div>
-        </div>
-        <div class="note-meta">
-          <span>2026-08-24 09:12</span>
-          <span>記載: 内科 佐藤</span>
-          <span class="chip">下書き</span>
-          <span class="save">未保存の変更あり</span>
-        </div>
-        <div class="note-body" id="noteBody">
-          <div class="beam"></div>
-          <div class="soap">
+      <div class="note" id="note"></div>
 
-            <div class="soap-row">
-              <div class="soap-tag">S</div>
-              <div class="soap-lines" id="sec-s">
-                <p class="ln" id="ln-s1">呼吸苦なし。食事は7割程度摂取。夜間良眠。</p>
-              </div>
-            </div>
-
-            <div class="soap-row">
-              <div class="soap-tag">O</div>
-              <div class="soap-lines" id="sec-o">
-                <p class="ln" id="ln-o1">体温 36.8℃、血圧 128/74、脈拍 76。</p>
-                <p class="ln" id="ln-o2">SpO2 96%（room air）。</p>
-                <p class="ln" id="ln-o3">肺雑音は右下肺で減少傾向。</p>
-              </div>
-            </div>
-
-            <div class="soap-row">
-              <div class="soap-tag">A</div>
-              <div class="soap-lines" id="sec-a">
-                <p class="ln" id="ln-a1"># 誤嚥性肺炎 — 解熱し炎症反応も改善傾向。抗菌薬継続とする。</p>
-                <p class="ln" id="ln-a2"># 低カリウム血症（K 2.9）</p>
-              </div>
-            </div>
-
-            <div class="soap-row">
-              <div class="soap-tag">P</div>
-              <div class="soap-lines" id="sec-p">
-                <p class="ln" id="ln-p1">・ABPC/SBT 3g 8時間毎 継続</p>
-                <p class="ln" id="ln-p2">・喀痰培養結果待ち</p>
-                <p class="ln" id="ln-p3">・酸素 2L/min 継続、SpO2フォロー</p>
-                <p class="ln" id="ln-p4">・嚥下リハビリ継続<span class="editing-caret"></span></p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- ===== right pane: ChartLint ===== -->
@@ -794,12 +732,8 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
             <h1>ChartLint</h1>
             <p>documentation quality assurance</p>
           </div>
-          <span class="ver">v0.9</span>
+          <button class="btn-check" id="btnCheck">カルテをチェック <kbd>⌘⇧L</kbd></button>
         </div>
-        <p class="creed">
-          ChartLint は治療方針を提案しません。<b>あなたが書いた記録の中の矛盾・抜け・古い情報</b>だけを指摘します。本文の書き換えは、必ず医師の承認後に行われます。
-        </p>
-        <button class="btn-check" id="btnCheck">カルテをチェック <kbd>⌘⇧L</kbd></button>
       </div>
       <div class="rail-body" id="railBody">
         <div class="idle">
@@ -817,7 +751,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   <div class="foot">
     <span class="mock">DEMO</span>
     <span>これはデモ用モックです。患者・病院・記録はすべて架空です。</span>
-    <span class="right">ChartLint v0.9.8 (build 8) / ruleset: internal-medicine-jp</span>
+    <span class="right">ChartLint v0.11.0 (build 12) / ruleset: internal-medicine-jp</span>
   </div>
 
 </div>
@@ -828,80 +762,561 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
   function boot() {
 
-  var RULES = [
+  /* ================= scenario data ================= */
+
+  var SCENARIOS = [
+
+    /* ---------- 1. 誤嚥性肺炎 ---------- */
     {
-      id: "CL-004", sev: "err", title: "記録内矛盾（酸素投与）",
-      desc: "O)「SpO2 96%（room air）」と P)「酸素 2L/min 継続」が矛盾しています。同一記録内で酸素投与の有無が一致していません。",
-      evi: "経過記録 O) 2行目 / P) 3行目（記録内の自己矛盾）",
-      targets: ["ln-o2", "ln-p3"], scrollTo: "ln-o2", evidence: [],
-      diff: [
-        { t: "del", s: "-", x: "O) SpO2 96%（room air）。" },
-        { t: "add", s: "+", x: "O) SpO2 96%（O2 2L/min 投与下）。" }
+      tabDx: "誤嚥性肺炎",
+      fileref: "progress-note 8/24",
+      patient: {
+        id: "0012345", name: "山田 太郎", kana: "ヤマダ タロウ", demo: "78歳・男性",
+        day: "入院5日目",
+        facts: [
+          { k: "入院日", v: "2026-08-20" },
+          { k: "病棟", v: "5A-512" },
+          { k: "診断", v: "誤嚥性肺炎", dx: true }
+        ],
+        allergy: { val: "ペニシリン系", sub: "（発疹）" }
+      },
+      labs: {
+        stamp: "8/24 06:40",
+        items: [
+          { n: "WBC", u: "/μL", v: "7,200", p: ["前回 9,800"] },
+          { n: "CRP", u: "mg/dL", v: "5.8", p: ["前回 12.4"] },
+          { n: "K", u: "mEq/L", v: "2.9", arrow: "↓", abn: true, id: "eviK", p: ["前回 3.4", "基準 3.6–4.8"] },
+          { n: "Cr", u: "mg/dL", v: "1.6", arrow: "↑", abn: true, id: "eviCr", p: ["8/22 0.9"] },
+          { n: "Na", u: "mEq/L", v: "138", p: ["前回 139"] }
+        ]
+      },
+      cards: [
+        {
+          id: "eviMicro", title: "細菌検査", kind: "fact",
+          spec: "喀痰培養 / 8-20 採取", val: "Klebsiella pneumoniae",
+          chip: "8/23 結果確定"
+        },
+        {
+          id: "eviRx", title: "処方中薬剤", kind: "rx",
+          items: [
+            { drug: "ABPC/SBT", dose: "3g 8時間毎 点滴 8/20〜", sub: "アンピシリン・スルバクタム（ペニシリン系）" },
+            { drug: "ランソプラゾール", dose: "15mg 1日1回 朝" },
+            { drug: "アムロジピン", dose: "5mg 1日1回 朝" }
+          ]
+        }
       ],
-      action: { kind: "replace", line: "ln-o2", text: "SpO2 96%（O2 2L/min 投与下）。" }
+      note: {
+        kindLabel: "経過記録",
+        tabs: ["経過記録（SOAP）", "8/23", "8/22", "入院時記録"],
+        time: "2026-08-24 09:12", author: "記載: 内科 佐藤", chip: "下書き",
+        sections: [
+          { tag: "S", id: "sec-s", lines: [
+            { id: "ln-s1", t: "呼吸苦なし。食事は7割程度摂取。夜間良眠。" }
+          ] },
+          { tag: "O", id: "sec-o", lines: [
+            { id: "ln-o1", t: "体温 36.8℃、血圧 128/74、脈拍 76。" },
+            { id: "ln-o2", t: "SpO2 96%（room air）。" },
+            { id: "ln-o3", t: "肺雑音は右下肺で減少傾向。" }
+          ] },
+          { tag: "A", id: "sec-a", lines: [
+            { id: "ln-a1", t: "# 誤嚥性肺炎 — 解熱し炎症反応も改善傾向。抗菌薬継続とする。" },
+            { id: "ln-a2", t: "# 低カリウム血症（K 2.9）" }
+          ] },
+          { tag: "P", id: "sec-p", lines: [
+            { id: "ln-p1", t: "・ABPC/SBT 3g 8時間毎 継続" },
+            { id: "ln-p2", t: "・喀痰培養結果待ち" },
+            { id: "ln-p3", t: "・酸素 2L/min 継続、SpO2フォロー" },
+            { id: "ln-p4", t: "・嚥下リハビリ継続" }
+          ] }
+        ]
+      },
+      rules: [
+        {
+          id: "CL-004", sev: "err", title: "記録内矛盾（酸素投与）",
+          desc: "O)「[[ln-o2|SpO2 96%（room air）]]」と P)「[[ln-p3|酸素 2L/min 継続]]」が矛盾しています。同一記録内で酸素投与の有無が一致していません。",
+          targets: ["ln-o2", "ln-p3"], scrollTo: "ln-o2", evidence: [],
+          diff: [
+            { t: "del", s: "-", x: "O) SpO2 96%（room air）。" },
+            { t: "add", s: "+", x: "O) SpO2 96%（O2 2L/min 投与下）。" }
+          ],
+          action: { kind: "replace", line: "ln-o2", text: "SpO2 96%（O2 2L/min 投与下）。" }
+        },
+        {
+          id: "CL-021", sev: "err", title: "アレルギー・処方矛盾",
+          desc: "アレルギー欄に「[[eviAllergy|ペニシリン系]]」がありますが、Plan にペニシリン系抗菌薬 [[eviRx|ABPC/SBT]] の継続が記載されています。",
+          targets: ["ln-p1"], scrollTo: "ln-p1", evidence: ["eviAllergy", "eviRx"],
+          diff: [
+            { t: "ctx", s: " ", x: "P) ・ABPC/SBT 3g 8時間毎 継続" },
+            { t: "add", s: "+", x: "P) 　※ペニシリン系アレルギー歴（発疹）あり — 抗菌薬選択を要再検討（薬剤部に相談）" }
+          ],
+          action: {
+            kind: "after", line: "ln-p1", cls: "note-warn",
+            text: "　※ペニシリン系アレルギー歴（発疹）あり — 抗菌薬選択を要再検討（薬剤部に相談）"
+          }
+        },
+        {
+          id: "CL-001", sev: "warn", title: "Assessment に対応する Plan がない",
+          desc: "A) に「低カリウム血症（[[eviK|K 2.9]]）」がありますが、対応する Plan を検出できませんでした。",
+          targets: ["ln-a2"], scrollTo: "ln-a2", evidence: ["eviK"],
+          diff: [
+            { t: "ctx", s: " ", x: "P) ・嚥下リハビリ継続" },
+            { t: "add", s: "+", x: "P) ・低K血症: カリウム補充を検討、明日 K 再検" }
+          ],
+          action: { kind: "append", sec: "sec-p", text: "・低K血症: カリウム補充を検討、明日 K 再検" }
+        },
+        {
+          id: "CL-013", sev: "warn", title: "重要な検査値変化に言及なし",
+          desc: "Cr が [[eviCr|0.9 → 1.6]]（8/22→8/24）と上昇していますが、Assessment に腎機能への言及がありません。",
+          targets: ["ln-a1", "ln-a2"], scrollTo: "ln-a1", evidence: ["eviCr"],
+          diff: [
+            { t: "ctx", s: " ", x: "A) # 低カリウム血症（K 2.9）" },
+            { t: "add", s: "+", x: "A) # 腎機能障害の進行（Cr 0.9→1.6）— 脱水・薬剤性の評価を行う" }
+          ],
+          action: { kind: "append", sec: "sec-a", text: "# 腎機能障害の進行（Cr 0.9→1.6）— 脱水・薬剤性の評価を行う" }
+        },
+        {
+          id: "CL-033", sev: "warn", title: "古い情報のコピー残存",
+          desc: "P)「[[ln-p2|喀痰培養結果待ち]]」とありますが、喀痰培養は 8/23 に結果が確定しています（[[eviMicro|Klebsiella pneumoniae]]）。前日の記録からコピーされた可能性があります。",
+          targets: ["ln-p2"], scrollTo: "ln-p2", evidence: ["eviMicro"],
+          diff: [
+            { t: "del", s: "-", x: "P) ・喀痰培養結果待ち" },
+            { t: "add", s: "+", x: "P) ・喀痰培養: Klebsiella pneumoniae 検出（8/23確定）— 感受性結果を確認" }
+          ],
+          action: {
+            kind: "replace", line: "ln-p2",
+            text: "・喀痰培養: Klebsiella pneumoniae 検出（8/23確定）— 感受性結果を確認"
+          }
+        }
+      ]
     },
+
+    /* ---------- 2. 心不全増悪 ---------- */
     {
-      id: "CL-021", sev: "err", title: "アレルギー・処方矛盾",
-      desc: "アレルギー欄に「ペニシリン系」がありますが、Plan にペニシリン系抗菌薬 ABPC/SBT の継続が記載されています。",
-      evi: "アレルギー登録: ペニシリン系（発疹） / 処方中: ABPC/SBT 3g 8時間毎",
-      targets: ["ln-p1"], scrollTo: "ln-p1", evidence: ["eviAllergy", "eviRx"],
-      diff: [
-        { t: "ctx", s: " ", x: "P) ・ABPC/SBT 3g 8時間毎 継続" },
-        { t: "add", s: "+", x: "P) 　※ペニシリン系アレルギー歴（発疹）あり — 抗菌薬選択を要再検討（薬剤部に相談）" }
+      tabDx: "心不全増悪",
+      fileref: "progress-note 8/24",
+      patient: {
+        id: "0034567", name: "佐藤 ハナ", kana: "サトウ ハナ", demo: "82歳・女性",
+        day: "入院8日目",
+        facts: [
+          { k: "入院日", v: "2026-08-17" },
+          { k: "病棟", v: "6B-301" },
+          { k: "診断", v: "うっ血性心不全の増悪", dx: true }
+        ],
+        allergy: null
+      },
+      labs: {
+        stamp: "8/24 06:30",
+        items: [
+          { n: "BNP", u: "pg/mL", v: "890", arrow: "↑", abn: true, p: ["前回 1,240", "基準 <100"] },
+          { n: "K", u: "mEq/L", v: "5.6", arrow: "↑", abn: true, id: "eviK", p: ["前回 4.2", "基準 3.6–4.8"] },
+          { n: "Cr", u: "mg/dL", v: "1.4", arrow: "↑", abn: true, id: "eviCr", p: ["前回 1.1"] },
+          { n: "Na", u: "mEq/L", v: "133", arrow: "↓", abn: true, p: ["基準 135–145"] }
+        ]
+      },
+      cards: [
+        {
+          id: "eviEcho", title: "心エコー", kind: "fact",
+          spec: "経胸壁心エコー / 8-22 実施", val: "EF 38%", valClass: "plain",
+          chip: "8/22 実施済み", chipTone: "ok"
+        },
+        {
+          id: "eviRx", title: "処方中薬剤", kind: "rx",
+          items: [
+            { drug: "フロセミド", dose: "40mg 1日1回 朝" },
+            { drug: "スピロノラクトン", dose: "25mg 1日1回 朝", sub: "抗アルドステロン薬（8/23 開始）" },
+            { drug: "エナラプリル", dose: "5mg 1日1回 朝", sub: "ACE阻害薬" }
+          ]
+        }
       ],
-      action: {
-        kind: "after", line: "ln-p1", cls: "note-warn",
-        text: "　※ペニシリン系アレルギー歴（発疹）あり — 抗菌薬選択を要再検討（薬剤部に相談）"
-      }
+      note: {
+        kindLabel: "経過記録",
+        tabs: ["経過記録（SOAP）", "8/23", "8/22", "入院時記録"],
+        time: "2026-08-24 08:50", author: "記載: 循環器内科 田中", chip: "下書き",
+        sections: [
+          { tag: "S", id: "sec-c-s", lines: [
+            { id: "ln-c-s1", t: "息切れは改善。夜間の呼吸苦なし。浮腫は軽減してきた印象。" }
+          ] },
+          { tag: "O", id: "sec-c-o", lines: [
+            { id: "ln-c-o1", t: "体温 36.5℃、血圧 112/68、脈拍 72 整。SpO2 95%（room air）。" },
+            { id: "ln-c-o2", t: "下腿浮腫 増悪あり。肺うっ血音は改善傾向。" },
+            { id: "ln-c-o3", t: "体重 52.4kg（前日 52.1kg）。" }
+          ] },
+          { tag: "A", id: "sec-c-a", lines: [
+            { id: "ln-c-a1", t: "# うっ血性心不全の増悪 — 自覚症状は改善。利尿薬を増量し体液管理を継続する。" }
+          ] },
+          { tag: "P", id: "sec-c-p", lines: [
+            { id: "ln-c-p1", t: "・フロセミド 40mg → 20mg に減量" },
+            { id: "ln-c-p2", t: "・本日 心エコー予定" },
+            { id: "ln-c-p3", t: "・飲水制限 1,000mL/日 継続" },
+            { id: "ln-c-p4", t: "・心臓リハビリ継続" }
+          ] }
+        ]
+      },
+      rules: [
+        {
+          id: "CL-002", sev: "err", title: "肯定/否定の矛盾（浮腫）",
+          desc: "S)「[[ln-c-s1|浮腫は軽減してきた印象]]」と O)「[[ln-c-o2|下腿浮腫 増悪あり]]」が矛盾しています。同一記録内で浮腫の方向が一致していません。",
+          targets: ["ln-c-s1", "ln-c-o2"], scrollTo: "ln-c-o2", evidence: [],
+          diff: [
+            { t: "del", s: "-", x: "O) 下腿浮腫 増悪あり。肺うっ血音は改善傾向。" },
+            { t: "add", s: "+", x: "O) 下腿浮腫 軽度残存（前日より改善）。肺うっ血音は改善傾向。" }
+          ],
+          action: {
+            kind: "replace", line: "ln-c-o2",
+            text: "下腿浮腫 軽度残存（前日より改善）。肺うっ血音は改善傾向。"
+          }
+        },
+        {
+          id: "CL-008", sev: "err", title: "治療方針の矛盾（利尿薬）",
+          desc: "A)「[[ln-c-a1|利尿薬を増量し]]」と P)「[[ln-c-p1|フロセミド 40mg → 20mg に減量]]」が矛盾しています。",
+          targets: ["ln-c-a1", "ln-c-p1"], scrollTo: "ln-c-a1", evidence: [],
+          diff: [
+            { t: "del", s: "-", x: "A) # うっ血性心不全の増悪 — 自覚症状は改善。利尿薬を増量し体液管理を継続する。" },
+            { t: "add", s: "+", x: "A) # うっ血性心不全の増悪 — 自覚症状は改善。利尿薬を調整し体液管理を継続する。" }
+          ],
+          action: {
+            kind: "replace", line: "ln-c-a1",
+            text: "# うっ血性心不全の増悪 — 自覚症状は改善。利尿薬を調整し体液管理を継続する。"
+          }
+        },
+        {
+          id: "CL-024", sev: "warn", title: "新規薬剤の開始理由が記載されていない",
+          desc: "8/23 に[[eviRx|スピロノラクトン]]が開始されていますが、記録に開始理由の記載を検出できませんでした。",
+          targets: ["ln-c-a1"], scrollTo: "ln-c-a1", evidence: ["eviRx"],
+          diff: [
+            { t: "ctx", s: " ", x: "A) # うっ血性心不全の増悪 — …" },
+            { t: "add", s: "+", x: "A) # 抗アルドステロン薬を追加（8/23〜）— 心不全増悪に対する強化" }
+          ],
+          action: { kind: "append", sec: "sec-c-a", text: "# 抗アルドステロン薬を追加（8/23〜）— 心不全増悪に対する強化" }
+        },
+        {
+          id: "CL-013", sev: "warn", title: "重要な検査値に言及なし",
+          desc: "[[eviK|K 5.6]]（基準 3.6–4.8）と上昇していますが、Assessment に高カリウム血症への言及がありません。[[eviRx|スピロノラクトンと ACE阻害薬]]が併用されています。",
+          targets: ["ln-c-a1"], scrollTo: "ln-c-a1", evidence: ["eviK", "eviRx"],
+          diff: [
+            { t: "ctx", s: " ", x: "A) # うっ血性心不全の増悪 — …" },
+            { t: "add", s: "+", x: "A) # 高カリウム血症（K 5.6）— 薬剤性の評価と再検を行う" }
+          ],
+          action: { kind: "append", sec: "sec-c-a", text: "# 高カリウム血症（K 5.6）— 薬剤性の評価と再検を行う" }
+        },
+        {
+          id: "CL-032", sev: "warn", title: "実施済み検査が「予定」のまま",
+          desc: "P)「[[ln-c-p2|本日 心エコー予定]]」とありますが、心エコーは [[eviEcho|8/22 に実施済み]]です（EF 38%）。前日までの記録からコピーされた可能性があります。",
+          targets: ["ln-c-p2"], scrollTo: "ln-c-p2", evidence: ["eviEcho"],
+          diff: [
+            { t: "del", s: "-", x: "P) ・本日 心エコー予定" },
+            { t: "add", s: "+", x: "P) ・心エコー結果（8/22, EF 38%）を踏まえ治療方針を再評価" }
+          ],
+          action: {
+            kind: "replace", line: "ln-c-p2",
+            text: "・心エコー結果（8/22, EF 38%）を踏まえ治療方針を再評価"
+          }
+        }
+      ]
     },
+
+    /* ---------- 3. 退院サマリー ---------- */
     {
-      id: "CL-001", sev: "warn", title: "Assessment に対応する Plan がない",
-      desc: "A) に「低カリウム血症（K 2.9）」がありますが、対応する Plan を検出できませんでした。",
-      evi: "A) # 低カリウム血症（K 2.9） / 検査結果 K 2.9 ↓（基準 3.6–4.8）",
-      targets: ["ln-a2"], scrollTo: "ln-a2", evidence: ["eviK"],
-      diff: [
-        { t: "ctx", s: " ", x: "P) ・嚥下リハビリ継続" },
-        { t: "add", s: "+", x: "P) ・低K血症: カリウム補充を検討、明日 K 再検" }
+      tabDx: "S状結腸癌 術後",
+      fileref: "discharge-summary 8/24",
+      patient: {
+        id: "0056789", name: "鈴木 一郎", kana: "スズキ イチロウ", demo: "68歳・男性",
+        day: "術後6日目",
+        facts: [
+          { k: "入院日", v: "2026-08-17" },
+          { k: "病棟", v: "4A-210" },
+          { k: "診断", v: "S状結腸癌（術後）", dx: true },
+          { k: "退院予定", v: "2026-08-25" }
+        ],
+        allergy: null
+      },
+      labs: {
+        stamp: "8/24 06:20",
+        items: [
+          { n: "WBC", u: "/μL", v: "8,900", p: ["前回 9,600"] },
+          { n: "CRP", u: "mg/dL", v: "3.2", arrow: "↓", p: ["前回 6.8"] },
+          { n: "Hb", u: "g/dL", v: "10.8", arrow: "↓", abn: true, p: ["基準 13.5–17.0"] }
+        ]
+      },
+      cards: [
+        {
+          id: "eviPath", title: "病理検査", kind: "fact",
+          spec: "S状結腸 切除検体 / 8-18 提出", val: "結果未着（pending）", valClass: "pending",
+          chip: "8/18 提出・結果待ち"
+        },
+        {
+          id: "eviRx", title: "退院処方", kind: "rx",
+          items: [
+            { drug: "ロキソプロフェン", dose: "60mg 疼痛時 頓用" },
+            { drug: "酸化マグネシウム", dose: "330mg 1日3回" }
+          ]
+        }
       ],
-      action: { kind: "append", sec: "sec-p", text: "・低K血症: カリウム補充を検討、明日 K 再検" }
-    },
-    {
-      id: "CL-013", sev: "warn", title: "重要な検査値変化に言及なし",
-      desc: "Cr が 0.9 → 1.6（8/22→8/24）と上昇していますが、Assessment に腎機能への言及がありません。",
-      evi: "検査結果 Cr 1.6 ↑（前回 8/22: 0.9）",
-      targets: ["ln-a1", "ln-a2"], scrollTo: "ln-a1", evidence: ["eviCr"],
-      diff: [
-        { t: "ctx", s: " ", x: "A) # 低カリウム血症（K 2.9）" },
-        { t: "add", s: "+", x: "A) # 腎機能障害の進行（Cr 0.9→1.6）— 脱水・薬剤性の評価を行う" }
-      ],
-      action: { kind: "append", sec: "sec-a", text: "# 腎機能障害の進行（Cr 0.9→1.6）— 脱水・薬剤性の評価を行う" }
-    },
-    {
-      id: "CL-033", sev: "warn", title: "古い情報のコピー残存",
-      desc: "P)「喀痰培養結果待ち」とありますが、喀痰培養は 8/23 に結果が確定しています（Klebsiella pneumoniae）。前日の記録からコピーされた可能性があります。",
-      evi: "細菌検査: 喀痰培養（8/20 採取）— 8/23 結果確定",
-      targets: ["ln-p2"], scrollTo: "ln-p2", evidence: ["eviMicro"],
-      diff: [
-        { t: "del", s: "-", x: "P) ・喀痰培養結果待ち" },
-        { t: "add", s: "+", x: "P) ・喀痰培養: Klebsiella pneumoniae 検出（8/23確定）— 感受性結果を確認" }
-      ],
-      action: {
-        kind: "replace", line: "ln-p2",
-        text: "・喀痰培養: Klebsiella pneumoniae 検出（8/23確定）— 感受性結果を確認"
-      }
+      note: {
+        kindLabel: "退院サマリー",
+        tabs: ["退院サマリー（草稿）", "経過記録 8/24", "8/23", "入院時記録"],
+        time: "2026-08-24 16:05", author: "記載: 消化器外科 高橋", chip: "草稿",
+        sections: [
+          { tag: "経過", id: "sec-d-k", lines: [
+            { id: "ln-d-k1", t: "8/18 腹腔鏡下S状結腸切除術施行。術後経過は概ね良好で、食事摂取も安定している。" },
+            { id: "ln-d-k2", t: "本日 37.4℃の微熱があり経過観察を要する。" }
+          ] },
+          { tag: "方針", id: "sec-d-h", lines: [
+            { id: "ln-d-h1", t: "・明日 8/25 退院予定" },
+            { id: "ln-d-h2", t: "・鎮痛薬はロキソプロフェン頓用へ変更" },
+            { id: "ln-d-h3", t: "・創部は治癒良好、抜糸済み" },
+            { id: "ln-d-h4", t: "・※病名コードあとで確認", cls: "note-warn" }
+          ] }
+        ]
+      },
+      rules: [
+        {
+          id: "CL-009", sev: "err", title: "退院方針と所見の矛盾",
+          desc: "方針)「[[ln-d-h1|明日 8/25 退院予定]]」とありますが、同じ記録に「[[ln-d-k2|37.4℃の微熱があり経過観察を要する]]」と記載されています。",
+          targets: ["ln-d-k2", "ln-d-h1"], scrollTo: "ln-d-k2", evidence: [],
+          diff: [
+            { t: "del", s: "-", x: "経過) 本日 37.4℃の微熱があり経過観察を要する。" },
+            { t: "add", s: "+", x: "経過) 本日 37.4℃の微熱があり経過観察を要する（退院可否は明朝の体温で最終判断）。" }
+          ],
+          action: {
+            kind: "replace", line: "ln-d-k2",
+            text: "本日 37.4℃の微熱があり経過観察を要する（退院可否は明朝の体温で最終判断）。"
+          }
+        },
+        {
+          id: "CL-047", sev: "warn", title: "退院時 pending 検査の未記載",
+          desc: "[[eviPath|8/18 提出の病理結果が未着]]ですが、退院サマリーに言及がありません。",
+          targets: ["ln-d-h1"], scrollTo: "ln-d-h1", evidence: ["eviPath"],
+          diff: [
+            { t: "ctx", s: " ", x: "方針) ・創部は治癒良好、抜糸済み" },
+            { t: "add", s: "+", x: "方針) ・病理結果: 未着（8/18提出）— 外来受診時に説明予定" }
+          ],
+          action: { kind: "append", sec: "sec-d-h", text: "・病理結果: 未着（8/18提出）— 外来受診時に説明予定" }
+        },
+        {
+          id: "CL-049", sev: "warn", title: "フォローアップ先・時期の記載なし",
+          desc: "[[ln-d-h1|明日 8/25 退院予定]]と記載されていますが、退院後の受診先と時期の記載を検出できませんでした。",
+          targets: ["ln-d-h1"], scrollTo: "ln-d-h1", evidence: [],
+          diff: [
+            { t: "ctx", s: " ", x: "方針) ・創部は治癒良好、抜糸済み" },
+            { t: "add", s: "+", x: "方針) ・外来フォロー: 消化器外科 9/1 受診（創部確認・病理説明）" }
+          ],
+          action: { kind: "append", sec: "sec-d-h", text: "・外来フォロー: 消化器外科 9/1 受診（創部確認・病理説明）" }
+        },
+        {
+          id: "CL-046", sev: "warn", title: "退院時の薬剤変更に理由がない",
+          desc: "方針)「[[ln-d-h2|鎮痛薬はロキソプロフェン頓用へ変更]]」とありますが、変更理由が記載されていません（[[eviRx|退院処方]]）。",
+          targets: ["ln-d-h2"], scrollTo: "ln-d-h2", evidence: ["eviRx"],
+          diff: [
+            { t: "del", s: "-", x: "方針) ・鎮痛薬はロキソプロフェン頓用へ変更" },
+            { t: "add", s: "+", x: "方針) ・鎮痛薬は疼痛軽減に伴いロキソプロフェン頓用へ変更" }
+          ],
+          action: {
+            kind: "replace", line: "ln-d-h2",
+            text: "・鎮痛薬は疼痛軽減に伴いロキソプロフェン頓用へ変更"
+          }
+        },
+        {
+          id: "CL-050", sev: "info", title: "未完成の作業メモが残っている",
+          desc: "方針) に「[[ln-d-h4|※病名コードあとで確認]]」という作業メモが残っています。退院サマリーは確定文書のため、確定前に解消してください。",
+          targets: ["ln-d-h4"], scrollTo: "ln-d-h4", evidence: [],
+          diff: [
+            { t: "del", s: "-", x: "方針) ・※病名コードあとで確認" }
+          ],
+          action: { kind: "remove", line: "ln-d-h4" }
+        }
+      ]
     }
   ];
 
+  /* ================= constants ================= */
+
+  var SEV = ["err", "warn", "info"];
+  var ICO = { err: "🔴", warn: "🟡", info: "🔵" };
+  var SEVLABEL = { err: "ERROR", warn: "WARNING", info: "INFO" };
+  var COUNTLABEL = { err: "Errors", warn: "Warnings", info: "Info" };
+
+  var PHASES = [
+    "構文解析: 記録の構造を読み取り中…",
+    "検査結果と本文を照合中…",
+    "処方・アレルギー登録と照合中…",
+    "記録内の整合性を検証中…"
+  ];
+
+  /* ================= state ================= */
+
+  var ptabsEl = document.getElementById("ptabs");
+  var pheadEl = document.getElementById("phead");
+  var eviBandEl = document.getElementById("eviBand");
+  var noteEl = document.getElementById("note");
   var railBody = document.getElementById("railBody");
-  var noteBody = document.getElementById("noteBody");
   var btnCheck = document.getElementById("btnCheck");
-  var open = RULES.length;
-  var errLeft = 2, warnLeft = 3;
+  var tbDayEl = document.getElementById("tbDay");
+  var paneChart = document.querySelector(".pane-chart");
+  var paneLabs = document.querySelector(".pane-labs");
+
+  var current = null;
+  var currentIndex = 0;
+  var noteBody = null;
+  var counts = null;
+  var counts0 = null;
+  var open = 0;
   var activeCard = null;
   var clearTimer = null;
+  var scanTimers = [];
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* ================= rendering ================= */
+
+  function renderTabs() {
+    var h = '<span class="plab">開いている患者</span>';
+    SCENARIOS.forEach(function (sc, i) {
+      h += '<button class="ptab' + (i === currentIndex ? " on" : "") + '" data-i="' + i + '">' +
+        '<span class="pn">' + esc(sc.patient.name) + '</span>' +
+        '<span class="pd">' + esc(sc.tabDx) + '</span></button>';
+    });
+    ptabsEl.innerHTML = h;
+    Array.prototype.forEach.call(ptabsEl.querySelectorAll(".ptab"), function (b) {
+      b.addEventListener("click", function () {
+        var i = +b.getAttribute("data-i");
+        if (i !== currentIndex) mount(i);
+      });
+    });
+  }
+
+  function renderHeader(sc) {
+    var p = sc.patient;
+    var h = '<div><div class="pt-id">ID: ' + esc(p.id) + '</div>' +
+      '<div class="pt-name"><span class="name">' + esc(p.name) + '</span>' +
+      '<span class="kana">' + esc(p.kana) + '</span>' +
+      '<span class="demo">' + esc(p.demo) + '</span></div></div>' +
+      '<dl class="pt-facts">';
+    p.facts.forEach(function (f) {
+      h += '<div class="fact"><dt>' + esc(f.k) + '</dt>' +
+        '<dd' + (f.dx ? ' class="dx"' : '') + '>' + esc(f.v) + '</dd></div>';
+    });
+    h += '</dl>';
+    if (p.allergy) {
+      h += '<div class="allergy" id="eviAllergy"><span class="al-ico">⚠️</span><div>' +
+        '<div class="al-lab">ALLERGY</div><div>' +
+        '<span class="al-val">' + esc(p.allergy.val) + '</span> ' +
+        '<span class="al-sub">' + esc(p.allergy.sub) + '</span></div></div></div>';
+    } else {
+      h += '<div class="allergy none" id="eviAllergy"><span class="al-ico">—</span><div>' +
+        '<div class="al-lab">ALLERGY</div><div>' +
+        '<span class="al-val">登録なし</span> ' +
+        '<span class="al-sub">（申告なし）</span></div></div></div>';
+    }
+    pheadEl.innerHTML = h;
+  }
+
+  function renderLabs(sc) {
+    var h = '<section class="card"><h2>検査結果<span class="stamp">' + esc(sc.labs.stamp) +
+      '</span></h2><div class="lab-strip">';
+    sc.labs.items.forEach(function (it) {
+      h += '<div class="lab-chip' + (it.abn ? " abn" : "") + '"' + (it.id ? ' id="' + it.id + '"' : '') + '>' +
+        '<div class="lb-n">' + esc(it.n) + '<em>' + esc(it.u) + '</em></div>' +
+        '<div class="lb-v">' + esc(it.v) + (it.arrow ? '<span class="arrow">' + it.arrow + '</span>' : '') + '</div>';
+      (it.p || []).forEach(function (x) { h += '<div class="lb-p">' + esc(x) + '</div>'; });
+      h += '</div>';
+    });
+    h += '</div></section>';
+
+    sc.cards.forEach(function (c) {
+      h += '<section class="card" id="' + c.id + '"><h2>' + esc(c.title) + '</h2>';
+      if (c.kind === "fact") {
+        h += '<div class="micro"><div class="spec">' + esc(c.spec) + '</div>' +
+          '<div class="org' + (c.valClass ? " " + c.valClass : "") + '">' + esc(c.val) + '</div>' +
+          '<div class="conf' + (c.chipTone ? " " + c.chipTone : "") + '">' + esc(c.chip) + '</div></div>';
+      } else {
+        h += '<ul class="rx">';
+        c.items.forEach(function (d) {
+          h += '<li><span class="drug">' + esc(d.drug) + '</span>' +
+            '<span class="dose">' + esc(d.dose) + '</span>' +
+            (d.sub ? '<span class="sub">' + esc(d.sub) + '</span>' : '') + '</li>';
+        });
+        h += '</ul>';
+      }
+      h += '</section>';
+    });
+    eviBandEl.innerHTML = h;
+  }
+
+  function renderNote(sc) {
+    var n = sc.note;
+    var lastSec = n.sections[n.sections.length - 1];
+    var h = '<div class="note-tabs">';
+    n.tabs.forEach(function (t, i) {
+      h += '<div class="tab' + (i === 0 ? " on" : "") + '">' + esc(t) + '</div>';
+    });
+    h += '</div><div class="note-meta"><span>' + esc(n.time) + '</span>' +
+      '<span>' + esc(n.author) + '</span>' +
+      '<span class="chip">' + esc(n.chip) + '</span>' +
+      '<span class="save">未保存の変更あり</span></div>' +
+      '<div class="note-body" id="noteBody"><div class="beam"></div><div class="soap">';
+    n.sections.forEach(function (sec) {
+      h += '<div class="soap-row"><div class="soap-tag' + (sec.tag.length > 1 ? " wide" : "") + '">' +
+        esc(sec.tag) + '</div><div class="soap-lines" id="' + sec.id + '">';
+      sec.lines.forEach(function (l, i) {
+        var caret = (sec === lastSec && i === sec.lines.length - 1) ? '<span class="editing-caret"></span>' : '';
+        h += '<p class="ln' + (l.cls ? " " + l.cls : "") + '" id="' + l.id + '">' + esc(l.t) + caret + '</p>';
+      });
+      h += '</div></div>';
+    });
+    h += '</div></div>';
+    noteEl.innerHTML = h;
+    noteBody = document.getElementById("noteBody");
+  }
+
+  function idleMarkup(sc) {
+    var ids = sc.rules.map(function (r) { return r.id; }).sort().map(function (id) {
+      return '<span>' + id + '</span>';
+    }).join("");
+    return '<div class="idle"><div class="glyph">{ }</div>' +
+      '<p>チェック未実行<br>「カルテをチェック」で' + esc(sc.note.kindLabel) + 'を解析します。</p>' +
+      '<div class="rules">' + ids + '<span>+ 42 rules</span></div></div>';
+  }
+
+  /* ================= mount / reset ================= */
+
+  function mount(i) {
+    currentIndex = i;
+    current = SCENARIOS[i];
+
+    if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
+    scanTimers.forEach(function (t) { clearTimeout(t); });
+    scanTimers = [];
+    activeCard = null;
+
+    counts = { err: 0, warn: 0, info: 0 };
+    current.rules.forEach(function (r) {
+      if (r.applyTimer) { clearTimeout(r.applyTimer); r.applyTimer = null; }
+      r.applied = false;
+      r.undo = null;
+      counts[r.sev]++;
+    });
+    counts0 = { err: counts.err, warn: counts.warn, info: counts.info };
+    open = current.rules.length;
+
+    renderTabs();
+    renderHeader(current);
+    renderLabs(current);
+    renderNote(current);
+    if (tbDayEl) tbDayEl.textContent = current.patient.day;
+
+    railBody.innerHTML = idleMarkup(current);
+    btnCheck.disabled = false;
+    btnCheck.innerHTML = 'カルテをチェック <kbd>⌘⇧L</kbd>';
+
+    if (paneChart) paneChart.scrollTop = 0;
+    if (paneLabs) paneLabs.scrollTop = 0;
+  }
 
   document.getElementById("btnReset").addEventListener("click", function () {
-    location.reload();
+    mount(currentIndex);
   });
 
   /* ---------- wheel fallback (embeds where native wheel scrolling is swallowed) ---------- */
@@ -923,14 +1338,17 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
     }
   );
 
-  /* ---------- highlight linking ---------- */
+  /* ================= highlight linking ================= */
+
   function clearMarks(hard) {
-    var i, els = noteBody.querySelectorAll(".ln");
-    for (i = 0; i < els.length; i++) {
+    if (!noteBody) return;
+    var els = noteBody.querySelectorAll(".ln");
+    for (var i = 0; i < els.length; i++) {
       els[i].classList.remove("hl-soft");
       if (hard) els[i].classList.remove("hl");
     }
   }
+
   function softHighlight(rule) {
     if (activeCard) return;
     if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; clearMarks(true); }
@@ -940,6 +1358,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
       if (el) el.classList.add("hl-soft");
     });
   }
+
   function hardHighlight(rule) {
     if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
     clearMarks(true);
@@ -960,50 +1379,148 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
     }
   }
 
-  /* ---------- text mutations ---------- */
-  function applyAction(a) {
+  /* ================= text mutations ================= */
+
+  /* 適用と同時に「元に戻す」ための復元情報を rule.undo に記録する */
+  function applyAction(rule) {
+    var a = rule.action;
+    var el, rec;
+
     if (a.kind === "replace") {
-      var el = document.getElementById(a.line);
+      el = document.getElementById(a.line);
       if (!el) return;
+      rec = { kind: "replace", el: el, prev: el.textContent };
+      rule.undo = rec;
       el.classList.add("fading");
-      setTimeout(function () {
+      rec.timer = setTimeout(function () {
+        rec.timer = null;
         el.textContent = a.text;
-        el.classList.remove("fading", "hl", "hl-soft");
+        el.classList.remove("fading", "hl", "hl-soft", "undoflash");
         void el.offsetWidth;
-        el.classList.add("flash");
+        el.classList.add("flash", "applied-mark");
       }, 230);
       return;
     }
+
+    if (a.kind === "remove") {
+      el = document.getElementById(a.line);
+      if (!el) return;
+      rec = { kind: "remove", el: el, parent: el.parentNode, next: el.nextSibling, marker: null };
+      rule.undo = rec;
+      el.classList.remove("hl", "hl-soft");
+      el.classList.add("removing");
+      rec.timer = setTimeout(function () {
+        rec.timer = null;
+        if (!el.parentNode) return;
+        var mark = document.createElement("div");
+        mark.className = "ln-removed";
+        mark.title = "1行削除（承認済み）";
+        el.parentNode.insertBefore(mark, el);
+        el.parentNode.removeChild(el);
+        rec.marker = mark;
+      }, 430);
+      return;
+    }
+
     var p = document.createElement("p");
-    p.className = "ln slidein flash" + (a.cls ? " " + a.cls : "");
+    p.className = "ln slidein flash applied-mark" + (a.cls ? " " + a.cls : "");
     p.textContent = a.text;
+    rec = { kind: "insert", el: p, caret: null, caretParent: null };
+
     if (a.kind === "after") {
       var ref = document.getElementById(a.line);
+      if (!ref) return;
       ref.parentNode.insertBefore(p, ref.nextSibling);
     } else {
       var sec = document.getElementById(a.sec);
+      if (!sec) return;
       var caret = sec.querySelector(".editing-caret");
-      if (caret) caret.parentNode.removeChild(caret);
+      if (caret) {
+        rec.caret = caret;
+        rec.caretParent = caret.parentNode;
+        caret.parentNode.removeChild(caret);
+      }
       sec.appendChild(p);
     }
+    rule.undo = rec;
     setTimeout(function () {
       if (p.scrollIntoView) p.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 120);
   }
 
-  /* ---------- rail rendering ---------- */
+  /* 記録した復元情報から本文を原状復帰する */
+  function revertAction(rec) {
+    if (!rec) return;
+    if (rec.timer) { clearTimeout(rec.timer); rec.timer = null; }
+    var el = rec.el;
+
+    if (rec.kind === "replace") {
+      el.textContent = rec.prev;
+      el.classList.remove("fading", "flash", "applied-mark", "hl", "hl-soft", "undoflash");
+      void el.offsetWidth;
+      el.classList.add("undoflash");
+      return;
+    }
+
+    if (rec.kind === "remove") {
+      if (rec.marker && rec.marker.parentNode) {
+        rec.marker.parentNode.insertBefore(el, rec.marker);
+        rec.marker.parentNode.removeChild(rec.marker);
+        rec.marker = null;
+      } else if (!el.parentNode && rec.parent) {
+        rec.parent.insertBefore(el, rec.next);
+      }
+      el.classList.remove("removing", "hl", "hl-soft", "undoflash");
+      void el.offsetWidth;
+      el.classList.add("undoflash");
+      return;
+    }
+
+    if (el.parentNode) el.parentNode.removeChild(el);
+    if (rec.caret && rec.caretParent) rec.caretParent.appendChild(rec.caret);
+  }
+
+  /* ================= rail rendering ================= */
+
   function countsMarkup() {
-    return '<div class="summary">' +
-      '<span class="count err' + (errLeft ? "" : " zero") + '" id="cErr"><span class="ico">🔴</span>' +
-      '<span id="nErr">' + errLeft + '</span> Errors</span>' +
-      '<span class="count warn' + (warnLeft ? "" : " zero") + '" id="cWarn"><span class="ico">🟡</span>' +
-      '<span id="nWarn">' + warnLeft + '</span> Warnings</span>' +
-      '<span class="fileref">progress-note 8/24</span>' +
-      '</div>';
+    var out = '<div class="summary">';
+    SEV.forEach(function (k) {
+      if (!counts0[k]) return;
+      out += '<span class="count ' + k + (counts[k] ? "" : " zero") + '" id="c-' + k + '">' +
+        '<span class="ico">' + ICO[k] + '</span>' +
+        '<span id="n-' + k + '">' + counts[k] + '</span> ' + COUNTLABEL[k] + '</span>';
+    });
+    out += '<span class="fileref">' + esc(current.fileref) + '</span></div>';
+    return out;
+  }
+
+  /* 説明文中の [[targetId|語句]] を根拠リンクに変換する */
+  function descMarkup(desc) {
+    return esc(desc).replace(/\[\[([A-Za-z0-9_-]+)\|([^\]]+)\]\]/g, function (m, id, label) {
+      return '<button type="button" class="evi-link" data-evi="' + id + '">' + label + '</button>';
+    });
+  }
+
+  /* 根拠リンクの飛び先: 検査値列のカードはパルス、本文の行はハイライト */
+  function pulseTarget(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (id.indexOf("ln-") === 0) {
+      clearMarks(true);
+      el.classList.add("hl");
+      if (clearTimer) clearTimeout(clearTimer);
+      clearTimer = setTimeout(function () { clearTimer = null; clearMarks(true); }, 2400);
+      if (el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      el.classList.remove("evi-hit");
+      void el.offsetWidth;
+      el.classList.add("evi-hit");
+      if (el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }
 
   function diffMarkup(diff) {
-    var out = '<div class="fix-lab">修正案</div><div class="diff">';
+    var out = '<div class="diff">';
     diff.forEach(function (d) {
       out += '<div class="' + d.t + '"><span class="sign">' + d.s + '</span><span>' +
         esc(d.x) + '</span></div>';
@@ -1011,22 +1528,18 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
     return out + "</div>";
   }
 
-  function esc(s) {
-    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-
   function cardMarkup(r, idx) {
     return '<article class="lc ' + r.sev + '" data-idx="' + idx + '" style="animation-delay:' +
       (idx * 90) + 'ms">' +
       '<div class="lc-head">' +
-        '<span class="sev">' + (r.sev === "err" ? "ERROR" : "WARNING") + '</span>' +
+        '<span class="sev">' + SEVLABEL[r.sev] + '</span>' +
         '<code class="rid">' + r.id + '</code>' +
         '<span class="rid-title">' + esc(r.title) + '</span>' +
         '<span class="lc-jump">該当箇所へ →</span>' +
+        '<button type="button" class="btn-undo">元に戻す</button>' +
       '</div>' +
       '<h3 class="lc-title">' + esc(r.title) + '</h3>' +
-      '<p class="lc-desc">' + esc(r.desc) + '</p>' +
-      '<div class="lc-evi"><b>根拠</b>' + esc(r.evi) + '</div>' +
+      '<p class="lc-desc">' + descMarkup(r.desc) + '</p>' +
       diffMarkup(r.diff) +
       '<div class="lc-actions">' +
         '<button class="btn-apply">承認して適用</button>' +
@@ -1037,7 +1550,7 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
   function renderResults() {
     var html = countsMarkup() + '<div class="cards">';
-    RULES.forEach(function (r, i) { html += cardMarkup(r, i); });
+    current.rules.forEach(function (r, i) { html += cardMarkup(r, i); });
     html += "</div>";
     railBody.innerHTML = html;
     wire();
@@ -1046,10 +1559,17 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
   function wire() {
     var cards = railBody.querySelectorAll(".lc");
     Array.prototype.forEach.call(cards, function (card) {
-      var rule = RULES[+card.getAttribute("data-idx")];
+      var rule = current.rules[+card.getAttribute("data-idx")];
 
       card.addEventListener("mouseenter", function () { softHighlight(rule); });
       card.addEventListener("mouseleave", function () { if (!activeCard) clearMarks(false); });
+
+      Array.prototype.forEach.call(card.querySelectorAll(".evi-link"), function (link) {
+        link.addEventListener("click", function (e) {
+          e.stopPropagation();
+          pulseTarget(link.getAttribute("data-evi"));
+        });
+      });
 
       card.addEventListener("click", function () {
         if (card.classList.contains("resolved")) return;
@@ -1063,8 +1583,12 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
         e.stopPropagation();
         if (rule.applied || card.classList.contains("resolved")) return;
         rule.applied = true;
+        rule.undo = null;
         hardHighlight(rule);
-        setTimeout(function () { applyAction(rule.action); }, 180);
+        rule.applyTimer = setTimeout(function () {
+          rule.applyTimer = null;
+          applyAction(rule);
+        }, 180);
         resolve(card, rule, "applied");
       });
 
@@ -1072,6 +1596,11 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
         e.stopPropagation();
         if (rule.applied) return;
         resolve(card, rule, "dismissed");
+      });
+
+      card.querySelector(".btn-undo").addEventListener("click", function (e) {
+        e.stopPropagation();
+        undoApply(card, rule);
       });
     });
   }
@@ -1084,21 +1613,50 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
     if (clearTimer) clearTimeout(clearTimer);
     clearTimer = setTimeout(function () { clearTimer = null; clearMarks(true); }, 1600);
 
-    if (rule.sev === "err") errLeft--; else warnLeft--;
+    counts[rule.sev]--;
     open--;
-    tick("nErr", errLeft, "cErr");
-    tick("nWarn", warnLeft, "cWarn");
+    refreshCounts();
     if (open === 0) setTimeout(showDone, 620);
   }
 
-  function tick(numId, val, chipId) {
-    var n = document.getElementById(numId);
-    if (n) n.textContent = val;
-    var c = document.getElementById(chipId);
-    if (c) c.classList.toggle("zero", val === 0);
+  function refreshCounts() {
+    SEV.forEach(function (k) {
+      if (!counts0[k]) return;
+      var n = document.getElementById("n-" + k);
+      if (n) n.textContent = counts[k];
+      var c = document.getElementById("c-" + k);
+      if (c) c.classList.toggle("zero", counts[k] === 0);
+    });
+  }
+
+  /* 承認適用の取り消し（「無視」の取り消しはスコープ外） */
+  function undoApply(card, rule) {
+    if (!rule.applied) return;
+
+    if (rule.applyTimer) { clearTimeout(rule.applyTimer); rule.applyTimer = null; }
+    revertAction(rule.undo);
+    rule.undo = null;
+    rule.applied = false;
+
+    card.classList.remove("resolved", "applied");
+    if (activeCard === card) activeCard = null;
+    if (clearTimer) { clearTimeout(clearTimer); clearTimer = null; }
+    clearMarks(true);
+
+    counts[rule.sev]++;
+    open++;
+    refreshCounts();
+
+    var done = railBody.querySelector(".done");
+    if (done && done.parentNode) done.parentNode.removeChild(done);
+
+    if (card.scrollIntoView) card.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function showDone() {
+    if (open !== 0) return;
+    if (railBody.querySelector(".done")) return;
+    var total = current.rules.length;
     var done = document.createElement("div");
     done.className = "done";
     done.innerHTML =
@@ -1108,20 +1666,15 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
       '</svg>' +
       '<h3>All checks passed</h3>' +
       '<p>指摘事項はありません。<br>記録内の矛盾はすべて確認済みです。</p>' +
-      '<div class="tally">5 issues reviewed · 承認による修正のみ適用</div>';
+      '<div class="tally">' + total + ' issues reviewed · 承認による修正のみ適用</div>';
     railBody.insertBefore(done, railBody.firstChild);
     if (done.scrollIntoView) done.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
-  /* ---------- scan ---------- */
-  var PHASES = [
-    "構文解析: SOAP 構造を読み取り中…",
-    "検査結果と本文を照合中…",
-    "処方・アレルギー登録と照合中…",
-    "記録内の整合性を検証中…"
-  ];
+  /* ================= scan ================= */
 
   btnCheck.addEventListener("click", function () {
+    if (btnCheck.disabled) return;
     btnCheck.disabled = true;
     btnCheck.textContent = "解析中…";
 
@@ -1136,17 +1689,20 @@ button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
 
     var fill = document.getElementById("pf");
     var txt = document.getElementById("pt");
-    setTimeout(function () { fill.style.width = "34%"; }, 40);
-    setTimeout(function () { fill.style.width = "62%"; txt.textContent = PHASES[1]; }, 420);
-    setTimeout(function () { fill.style.width = "84%"; txt.textContent = PHASES[2]; }, 820);
-    setTimeout(function () { fill.style.width = "100%"; txt.textContent = PHASES[3]; }, 1180);
+    scanTimers.push(setTimeout(function () { fill.style.width = "34%"; }, 40));
+    scanTimers.push(setTimeout(function () { fill.style.width = "62%"; txt.textContent = PHASES[1]; }, 420));
+    scanTimers.push(setTimeout(function () { fill.style.width = "84%"; txt.textContent = PHASES[2]; }, 820));
+    scanTimers.push(setTimeout(function () { fill.style.width = "100%"; txt.textContent = PHASES[3]; }, 1180));
 
-    setTimeout(function () {
+    scanTimers.push(setTimeout(function () {
       noteBody.classList.remove("scanning");
       renderResults();
-      btnCheck.textContent = "解析完了 · 5件検出";
-    }, 1550);
+      btnCheck.textContent = "解析完了 · " + current.rules.length + "件検出";
+    }, 1550));
   });
+
+  /* ================= start ================= */
+  mount(0);
 
   }
 
